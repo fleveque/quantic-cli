@@ -1,7 +1,7 @@
 # Go lessons
 
 Notes written while building `quantic-cli`, by someone whose daily languages are Elixir and Ruby. The
-same approach as [quantic-agent's lessons](https://github.com/fleveque/quantic-agent/tree/main/docs/lessons),
+same approach as [quantic-agent-go's lessons](https://github.com/fleveque/quantic-agent-go/tree/main/docs/lessons),
 on a program Go is the usual choice for.
 
 Each lesson pairs with a milestone from the [design](../design.md#12-milestones). They're not a Go
