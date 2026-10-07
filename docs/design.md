@@ -231,8 +231,15 @@ with an `errors` list, and still exits 0. The widget shows what it can.
 An Omarchy shell plugin: a bar pill with a popup panel. It follows the pattern of the built-in
 Tailscale widget, which drives the `tailscale` CLI (`tailscale status --json`) from QML.
 
+**It lives in its own repository**, not this one. `omarchy plugin add <git-url>` clones a repository
+and reads `manifest.json` at its root, so a plugin *is* a repository. The widget is also a different
+program: QML and JavaScript running inside Omarchy's shell, with no Go in it. What ties the two
+together is a contract, not shared code: the widget runs `quantic status --json` and reads
+`quantic.cli/status/v1` (section 8). The CLI can be used without the widget; the widget needs the
+CLI installed.
+
 ```
-omarchy/quantic/                 # in this repo; installed with `omarchy plugin add`
+omarchy-quantic/                 # its own repo; `omarchy plugin add <its git url>`
   manifest.json                  # kind: bar-widget (shape of omarchy.weather's)
   BarWidget.qml                  # the pill
   Panel.qml                      # the popup
@@ -281,8 +288,9 @@ internal/auth/          keyring, QUANTIC_TOKEN, the file fallback
 internal/cache/         files, freshness, ETags, per-entry locks
 internal/render/        tables (text/tabwriter) and JSON output types
 internal/status/        the concurrent composition behind `quantic status`
-omarchy/quantic/        the widget (QML)
 ```
+
+The widget is in its own repository (section 9).
 
 **Libraries:** `spf13/cobra` (commands), `zalando/go-keyring`, `oapi-codegen` (client from
 OpenAPI), `golang.org/x/sync/errgroup`, `rogpeppe/go-internal/testscript` (tests). The terminal
@@ -301,7 +309,8 @@ dashboard adds `charmbracelet/bubbletea` and `lipgloss`. Everything else from th
   readable `.txtar` scripts. The Go tool itself is tested this way.
 - **Contract test** on the server side: the OpenAPI document is checked against the controllers in
   Quantic's CI, so the API can't drift from what the CLI generated against.
-- The widget: `Model.js` parsing tested against the golden `status` JSON; the QML checked by hand.
+- The widget, in its repository: `Model.js` parsing tested against this repo's golden `status` JSON;
+  the QML checked by hand. When `status/v1` changes, the golden file is the signal for both.
 
 ---
 
@@ -319,7 +328,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | 4 | Cache: freshness, ETags, offline, locks | files, `encoding/json`, `flock`, time |
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts | — |
 | 5 | `upcoming` and `status`, concurrently | `errgroup`, partial failure |
-| 6 | The Omarchy widget | (QML; consuming your own JSON contract) |
+| 6 | The Omarchy widget, in its own repo | (QML, not Go; consuming your own JSON contract) |
 | 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew | build flags, cross-compilation, checksums |
 | 8 | `quantic dash`: terminal dashboard | Bubble Tea (Elm architecture) |
 | 9 | Browser login: OAuth 2.1, PKCE, loopback redirect | `net/http` server, `crypto/rand`, OAuth |
@@ -333,8 +342,8 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
    `upcoming` stays approximate (ex-dates only).
 2. **Does Quantic's OAuth server accept loopback redirect URIs** from dynamically registered
    clients? Needed for milestone 9; until then, tokens.
-3. **Where the widget lives:** a directory in this repo, or its own repo, depending on what
-   `omarchy plugin add` expects from a git URL.
+3. ~~Where the widget lives.~~ Its own repository: `omarchy plugin add` reads `manifest.json` at a
+   repository's root (section 9). Its name is still open (`omarchy-quantic`?).
 4. **The binary's name:** `quantic` is short; check for clashes in the AUR and Homebrew.
 5. **Sharing code with quantic-agent** (the MCP client, backoff): copy for now; a shared module only
    if both keep using it.
