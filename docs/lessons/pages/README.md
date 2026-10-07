@@ -1,7 +1,7 @@
 # Lesson pages
 
 How the formatted pages are made, so every lesson and walkthrough looks the same. The style is
-quantic-agent's, carried over unchanged.
+quantic-agent-go's, carried over unchanged.
 
 - `lesson-head.html`: the stylesheet and fonts of a lesson page.
 - `walkthrough-head.html`: the same for a walkthrough (code excerpts with file and line captions,
