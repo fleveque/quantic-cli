@@ -196,9 +196,9 @@ A script or the widget can tell "log in again" (4) from "offline" (3) without pa
 - **Offline:** if Quantic can't be reached, serve the cached copy with `stale: true` and its
   `fetched_at`, and exit 0. The bar keeps showing the last known state, marked stale.
 - **One fetch at a time:** a lock file per cache entry, so the widget and a terminal command don't
-  fetch the same thing at once (the `flock` pattern from quantic-agent-go's store).
+  fetch the same thing at once (the `flock` pattern quantic-agent's store uses).
 - **Rate limits:** anonymous calls share Quantic's 60/min per IP. A `429` is retried with backoff
-  and jitter, as in quantic-agent-go's `internal/mcp`, then exit 5. Authenticated calls aren't
+  and jitter, as quantic-agent's MCP client does, then exit 5. Authenticated calls aren't
   rate limited today, but the widget still refreshes no more than every few minutes.
 
 ---
@@ -338,12 +338,13 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 ## 13. Open questions
 
 1. **API in Quantic, or the CLI on MCP?** This design proposes the API (section 2). Confirm before
-   S1; if the answer is MCP, milestones 2–3 change to reuse quantic-agent-go's MCP client, and
+   S1; if the answer is MCP, milestones 2–3 change to reuse the MCP client from the Go version of the agent
+   ([quantic-agent-go](https://github.com/fleveque/quantic-agent-go), archived), and
    `upcoming` stays approximate (ex-dates only).
 2. **Does Quantic's OAuth server accept loopback redirect URIs** from dynamically registered
    clients? Needed for milestone 9; until then, tokens.
 3. ~~Where the widget lives.~~ Its own repository: `omarchy plugin add` reads `manifest.json` at a
    repository's root (section 9). Its name is still open (`omarchy-quantic`?).
 4. **The binary's name:** `quantic` is short; check for clashes in the AUR and Homebrew.
-5. **Sharing code with quantic-agent-go** (the MCP client, backoff): copy for now; a shared module only
-   if both keep using it.
+5. **Reusing Go code from the agent's Go version** (quantic-agent-go: the MCP client, backoff): copy
+   what's useful. That repository is archived and the agent is now Python, so there's no module to share.
