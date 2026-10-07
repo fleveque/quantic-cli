@@ -19,7 +19,7 @@ It only reads. Trades, portfolios and settings stay in the app.
 Command-line tools are what Go is most often chosen for (`gh`, `kubectl`, `docker`, `tailscale`):
 one static binary per platform, cross-compiled from one machine, with mature libraries for commands,
 keyrings, releases and terminal interfaces. It's also how I'm learning Go, milestone by milestone,
-with a lesson for each.
+with a [lesson](docs/lessons/README.md) and a line-by-line code walkthrough for each.
 
 ## Working on this
 
