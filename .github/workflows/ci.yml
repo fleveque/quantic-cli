@@ -18,26 +18,25 @@ jobs:
 
     # `test` is a required check from the start, so the branch protection is
     # final now. Until milestone 1 adds go.mod there is no Go to check, and
-    # every Go step is skipped; from then on they all run.
-    env:
-      HAS_GO: ${{ hashFiles('go.mod') != '' }}
+    # every Go step is skipped; from then on they all run. (hashFiles only
+    # works inside steps, hence the condition on each one.)
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: No Go module yet
-        if: env.HAS_GO != 'true'
+        if: hashFiles('go.mod') == ''
         run: echo "No go.mod yet; the Go checks start with milestone 1."
 
       - name: Set up Go
-        if: env.HAS_GO == 'true'
+        if: hashFiles('go.mod') != ''
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
       - name: Check formatting
-        if: env.HAS_GO == 'true'
+        if: hashFiles('go.mod') != ''
         run: |
           unformatted="$(gofmt -l .)"
           if [ -n "$unformatted" ]; then
@@ -47,21 +46,21 @@ jobs:
           fi
 
       - name: Build
-        if: env.HAS_GO == 'true'
+        if: hashFiles('go.mod') != ''
         run: go build ./...
 
       # A CLI is distributed as one static binary per platform: building with
       # cgo off proves no dependency has started needing a C toolchain.
       - name: Build without cgo
-        if: env.HAS_GO == 'true'
+        if: hashFiles('go.mod') != ''
         run: CGO_ENABLED=0 go build ./...
 
       - name: Vet
-        if: env.HAS_GO == 'true'
+        if: hashFiles('go.mod') != ''
         run: go vet ./...
 
       - name: Test
-        if: env.HAS_GO == 'true'
+        if: hashFiles('go.mod') != ''
         run: go test -race ./...
 
   docs:
