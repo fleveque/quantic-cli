@@ -6,8 +6,8 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 
 ## Status — 2026-10-07
 
-- Milestone 0: the design. Nothing built. Open question 1 (an `/api/v1` in Quantic, or the CLI on
-  MCP) must be answered by the author before milestone S1.
+- Milestone 0: the design. Nothing built. Open question 1 is decided: an `/api/v1` in Quantic
+  ([ADR 0001](docs/decisions/0001-json-api-not-mcp.md)). Next is milestone S1, in `../quantic`.
 
 ## Conventions
 
