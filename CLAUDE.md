@@ -1,7 +1,7 @@
 # quantic-cli — notes for Claude Code
 
-A read-only command-line client for Quantic Finance, plus an Omarchy bar widget built on its
-`--json` output. It is also the author's way of learning Go: someone coming from Elixir and Ruby.
+A read-only command-line client for Quantic Finance. Its `--json` output is a contract that other
+programs build on, the first being an Omarchy bar widget in its own repository (design §9). It is also the author's way of learning Go: someone coming from Elixir and Ruby.
 Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 
 ## Status — 2026-10-07

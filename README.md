@@ -1,7 +1,7 @@
 # quantic-cli
 
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
-income in the terminal and in scripts, and an [Omarchy](https://omarchy.org) bar widget built on it.
+income in the terminal, and in scripts and status bars through `--json`.
 
 > **Status: design.** Nothing is built yet. Start with the [design](docs/design.md).
 
