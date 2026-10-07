@@ -30,8 +30,9 @@ awkward to distribute. This is the honest reason, and it doesn't rely on "I want
 
 ## 2. Data source: a JSON API in Quantic
 
-**Proposed:** Quantic gets a read-only, versioned JSON API, `/api/v1`, and the CLI talks only to it.
-This is a server change, in Elixir, before the CLI's authenticated commands (milestone S1).
+**Decided** ([ADR 0001](decisions/0001-json-api-not-mcp.md)): Quantic gets a read-only, versioned
+JSON API, `/api/v1`, and the CLI talks only to it. This is a server change, in Elixir, before the
+CLI's authenticated commands (milestone S1).
 
 ```
              ┌──────────────── Quantic (Phoenix) ────────────────┐
@@ -337,10 +338,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 
 ## 13. Open questions
 
-1. **API in Quantic, or the CLI on MCP?** This design proposes the API (section 2). Confirm before
-   S1; if the answer is MCP, milestones 2–3 change to reuse the MCP client from the Go version of the agent
-   ([quantic-agent-go](https://github.com/fleveque/quantic-agent-go), archived), and
-   `upcoming` stays approximate (ex-dates only).
+1. ~~API in Quantic, or the CLI on MCP?~~ The API: [ADR 0001](decisions/0001-json-api-not-mcp.md).
 2. **Does Quantic's OAuth server accept loopback redirect URIs** from dynamically registered
    clients? Needed for milestone 9; until then, tokens.
 3. ~~Where the widget lives.~~ Its own repository: `omarchy plugin add` reads `manifest.json` at a
