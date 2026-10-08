@@ -2,7 +2,9 @@
 //
 // api.gen.go is generated from api/openapi.json, Quantic's own OpenAPI
 // document, by oapi-codegen; never edit it by hand. overlay.yaml renames its
-// operations and widens its numbers before generation (see the file).
+// operations and widens its numbers before generation, and
+// templates/imports.tmpl keeps the generated file's header from becoming a
+// second package comment (see each file).
 // client.go and retry.go are the thin wrapper the commands use: one method per
 // endpoint, typed errors, and retrying a rate-limited request.
 //

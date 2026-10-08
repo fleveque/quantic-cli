@@ -9,3 +9,5 @@ output-options:
     path: overlay.yaml
   # The generated client is unexported: commands use Client in client.go.
   client-type-name: genClient
+  user-templates:
+    imports.tmpl: templates/imports.tmpl
