@@ -10,7 +10,9 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   ([ADR 0001](docs/decisions/0001-json-api-not-mcp.md)).
 - Milestone S1 is done in `../quantic` (#482–#485): `/api/v1`, all of design §2.1 but `/upcoming`
   (S2), OpenAPI 3.0 at `/api/v1/openapi.json`, documented for people at
-  https://quantic.finance/developers. Next is milestone 1, when the author says.
+  https://quantic.finance/developers.
+- Milestone 1 (in review): Cobra skeleton, `version`, global flags, exit codes, testscript;
+  lesson 01 and walkthrough 01. Next is milestone 2, when the author says.
 
 ## Conventions
 

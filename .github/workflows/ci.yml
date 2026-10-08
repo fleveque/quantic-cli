@@ -72,7 +72,8 @@ jobs:
         uses: actions/checkout@v4
 
       # Checks relative links in every Markdown file; external URLs are not
-      # fetched.
+      # fetched. Fenced and inline code are skipped first: Go code is full of
+      # `](`, as in errors.AsType[*ExitError](err), and none of it is a link.
       - name: Check relative links resolve
         run: |
           fail=0
@@ -85,6 +86,6 @@ jobs:
                 echo "::error file=$file::broken relative link: $link"
                 fail=1
               fi
-            done < <(grep -oP '\]\(\K[^)]+' "$file" | grep -Ev '^(https?:|mailto:|#)')
+            done < <(sed '/^```/,/^```/d; s/`[^`]*`//g' "$file" | grep -oP '\]\(\K[^)]+' | grep -Ev '^(https?:|mailto:|#)')
           done < <(find . -name '*.md' -not -path './.git/*')
           exit "$fail"
