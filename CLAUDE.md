@@ -10,7 +10,9 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   ([ADR 0001](docs/decisions/0001-json-api-not-mcp.md)).
 - Milestone S1 is done in `../quantic` (#482–#485): `/api/v1`, all of design §2.1 but `/upcoming`
   (S2), OpenAPI 3.0 at `/api/v1/openapi.json`, documented for people at
-  https://quantic.finance/developers. Next is milestone 1, when the author says.
+  https://quantic.finance/developers.
+- Milestone 1 (in review): Cobra skeleton, `version`, global flags, exit codes, testscript;
+  lesson 01 and walkthrough 01. Next is milestone 2, when the author says.
 
 ## Conventions
 
@@ -27,6 +29,8 @@ These are quantic-agent's, on purpose: the same way of working, on a second Go p
   verbatim from a named commit with `docs/lessons/pages/build.py`; "try it" experiments show real
   outputs, usually by breaking the code on purpose and showing the test that catches it. Compare with
   Ruby or Elixir only where it genuinely helps. Linked from the lesson and the lessons README.
+- **Every PR updates `README.md`** (status, what works, how to try it) and any other Markdown it
+  makes stale: the design's milestone table, `CLAUDE.md`'s status, the lessons index.
 - **Milestones are worked one at a time**, each on its own branch and PR. The author says when to
   start the next one.
 - **Decisions are ADRs** in `docs/decisions/NNNN-*.md`.
