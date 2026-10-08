@@ -1,0 +1,18 @@
+# Wrong usage exits 2 (design §6), with the reason on stderr and nothing on
+# stdout, so a script piping stdout into jq never parses an error.
+
+exits 2 quantic verison
+! stdout .
+stderr '^quantic: unknown command "verison"; did you mean version\?$'
+stderr '^Run ''quantic --help'' for usage\.$'
+
+exits 2 quantic --bogus version
+! stdout .
+stderr 'unknown flag: --bogus'
+
+exits 2 quantic version now
+! stdout .
+
+exits 2 quantic --timeout 0s version
+! stdout .
+stderr '--timeout must be more than zero'

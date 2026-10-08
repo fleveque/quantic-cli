@@ -1,0 +1,16 @@
+# Asking for help isn't an error: exit 0, usage on stdout.
+
+exits 0 quantic
+stdout '^Usage:$'
+stdout 'version +Print the version of quantic'
+! stderr .
+
+exits 0 quantic --help
+stdout '--json +print JSON for programs'
+stdout '--timeout duration +give up on Quantic after this long \(default 10s\)'
+
+exits 0 quantic help version
+stdout 'quantic version \[flags\]'
+
+# Not until the release (milestone 7).
+! stdout completion

@@ -1,0 +1,14 @@
+# The version, for people and for programs.
+
+exits 0 quantic version
+stdout '^quantic \S+ .*go1\.\d+'
+! stderr .
+
+exits 0 quantic version --json
+stdout '"schema": "quantic.cli/version/v1"'
+stdout '"version": '
+! stderr .
+
+# A global flag works before the command as well as after it.
+exits 0 quantic --json version
+stdout '"schema": "quantic.cli/version/v1"'
