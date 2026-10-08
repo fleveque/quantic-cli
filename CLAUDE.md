@@ -4,10 +4,13 @@ A read-only command-line client for Quantic Finance. Its `--json` output is a co
 programs build on, the first being an Omarchy bar widget in its own repository (design §9). It is also the author's way of learning Go: someone coming from Elixir and Ruby.
 Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 
-## Status — 2026-10-07
+## Status — 2026-10-08
 
-- Milestone 0: the design. Nothing built. Open question 1 is decided: an `/api/v1` in Quantic
-  ([ADR 0001](docs/decisions/0001-json-api-not-mcp.md)). Next is milestone S1, in `../quantic`.
+- Milestone 0: the design. Open question 1 is decided: an `/api/v1` in Quantic
+  ([ADR 0001](docs/decisions/0001-json-api-not-mcp.md)).
+- Milestone S1 is done in `../quantic` (#482–#485): `/api/v1`, all of design §2.1 but `/upcoming`
+  (S2), OpenAPI 3.0 at `/api/v1/openapi.json`, documented for people at
+  https://quantic.finance/developers. Next is milestone 1, when the author says.
 
 ## Conventions
 

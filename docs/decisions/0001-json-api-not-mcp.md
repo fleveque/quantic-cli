@@ -50,5 +50,8 @@ copied. But the CLI's JSON contract would rest on output written for language mo
 could never show pay dates or amounts, and the widget would poll without conditional requests.
 Cheaper now, paid for on every later milestone.
 
+**Update, 2026-10-08.** Built in milestone S1. The document is OpenAPI 3.0, not 3.1, because 3.0
+is what `open_api_spex` generates; `oapi-codegen` supports both. The decision is otherwise unchanged.
+
 **Rejected alternative — MCP now, the API later.** Builds milestones 2–3 twice and makes the lessons
 about a client that gets thrown away.
