@@ -1,7 +1,7 @@
 # quantic-cli — design
 
-**Status:** draft, 2026-10-07. The server side of §2.1 is built (milestone S1, 2026-10-08); the CLI
-is not started.
+**Status:** draft, 2026-10-07. The server side of §2.1 is built (milestone S1, 2026-10-08). The CLI
+has its skeleton and the public commands (milestones 1–2).
 
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal and in scripts, plus an Omarchy bar widget built on it. It is also where I
@@ -293,6 +293,7 @@ show amounts in the bar.
 ## 10. Code layout
 
 ```
+api/openapi.json        a copy of Quantic's OpenAPI document (ADR 0002)
 cmd/quantic/            main: wiring only
 internal/cli/           Cobra commands, flags, exit codes
 internal/api/           client generated from Quantic's OpenAPI document, plus a thin wrapper
@@ -336,7 +337,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | 0 | Repo, this design | — |
 | S1 | **Quantic (Elixir):** `/api/v1`, all of §2.1 but `/upcoming`; OpenAPI doc. **Done** (#482–#485) | — (server work) |
 | 1 | Cobra skeleton: `version`, flags, `--json`, exit codes; `testscript`. **Done** (#5) | Cobra, `io.Writer` design, testscript |
-| 2 | Generated client; `calendar`, `stock`, `search` signed out | OpenAPI codegen, `net/http`, `context` |
+| 2 | Generated client; `calendar`, `stock`, `search` signed out. **Done** (#6, [ADR 0002](decisions/0002-generated-client-from-a-checked-in-spec.md)) | OpenAPI codegen, `net/http`, `context` |
 | 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income` | interfaces for secrets, OS integration |
 | 4 | Cache: freshness, ETags, offline, locks | files, `encoding/json`, `flock`, time |
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts | — |

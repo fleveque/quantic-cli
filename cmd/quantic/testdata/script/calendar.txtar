@@ -1,0 +1,28 @@
+# The public calendar, signed out: a table for people, --json for programs.
+
+exec quantic calendar --days 7
+! stderr .
+stdout '^EX-DATE +SYMBOL +NAME +SECTOR +FREQUENCY$'
+stdout '^2026-10-17  KO +Coca-Cola +Consumer Defensive +quarterly$'
+stdout '^2026-10-20  NOSECT +- +- +-$'
+grep '^GET /api/v1/calendar\?days=7$' requests.log
+
+exec quantic calendar --json
+stdout '"schema": "quantic.cli/calendar/v1"'
+stdout '"stale": false'
+stdout '"ex_date": "2026-10-17"'
+stdout '"sector": null'
+stdout '"name": null'
+stdout '"frequency": null'
+grep '^GET /api/v1/calendar\?days=45$' requests.log
+
+-- quantic/api/v1/calendar --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"from": "2026-10-08", "days": 7, "stocks": [
+  {"symbol": "KO", "name": "Coca-Cola", "sector": "Consumer Defensive",
+   "ex_dividend_date": "2026-10-17", "payment_frequency": "quarterly"},
+  {"symbol": "NOSECT", "name": null, "sector": null,
+   "ex_dividend_date": "2026-10-20", "payment_frequency": null}
+]}

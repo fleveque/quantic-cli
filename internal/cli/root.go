@@ -9,6 +9,7 @@ package cli
 import (
 	"fmt"
 	"io"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -22,6 +23,8 @@ type Options struct {
 	Portfolio string
 	NoCache   bool
 	Timeout   time.Duration
+
+	userAgent string // "quantic-cli/<version>", sent with every request
 }
 
 // defaultTimeout bounds one call to Quantic. Ten seconds is long for an API
@@ -50,7 +53,8 @@ func Run(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build) 
 }
 
 func newRootCmd(build Build) *cobra.Command {
-	opts := &Options{}
+	info, _ := debug.ReadBuildInfo()
+	opts := &Options{userAgent: "quantic-cli/" + build.withFallback(info).Version}
 
 	root := &cobra.Command{
 		Use:   "quantic",
@@ -58,7 +62,10 @@ func newRootCmd(build Build) *cobra.Command {
 		Long: `quantic reads your Quantic Finance portfolio, dividends and income, and
 public dividend data, from https://quantic.finance. It only reads.
 
-Tables are for people; --json is for scripts and status bars.`,
+Tables are for people; --json is for scripts and status bars.
+
+Environment:
+  QUANTIC_URL  where Quantic is (default https://quantic.finance)`,
 
 		// Run prints errors itself, once, with the right exit code. Left on,
 		// Cobra would print each error a second time, and the whole usage
@@ -109,7 +116,12 @@ Tables are for people; --json is for scripts and status bars.`,
 	flags.BoolVar(&opts.NoCache, "no-cache", false, "always ask Quantic; don't read or write the cache")
 	flags.DurationVar(&opts.Timeout, "timeout", defaultTimeout, "give up on Quantic after this long")
 
-	root.AddCommand(newVersionCmd(opts, build))
+	root.AddCommand(
+		newCalendarCmd(opts),
+		newStockCmd(opts),
+		newSearchCmd(opts),
+		newVersionCmd(opts, build),
+	)
 	return root
 }
 

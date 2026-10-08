@@ -1,0 +1,5 @@
+SPARSE  Written by hand
+
+Price     12.30 EUR
+Dividend  0.4812 EUR a share a year
+Safety    unknown

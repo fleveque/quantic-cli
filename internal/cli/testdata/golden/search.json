@@ -1,0 +1,22 @@
+{
+  "schema": "quantic.cli/search/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "query": "coca",
+  "items": [
+    {
+      "symbol": "CCC3.DE",
+      "name": "COCA-COLA CO., THE            R",
+      "exchange": null,
+      "type": "EQUITY",
+      "tracked": true
+    },
+    {
+      "symbol": "KO",
+      "name": "Coca-Cola",
+      "exchange": null,
+      "type": "EQUITY",
+      "tracked": true
+    }
+  ]
+}

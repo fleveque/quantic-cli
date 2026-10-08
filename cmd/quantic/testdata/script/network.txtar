@@ -1,0 +1,26 @@
+# When Quantic can't answer, the exit code says why (design §6), so a script
+# or the status bar can tell "offline" from "rate limited" without parsing.
+
+# Rate limited on every try: 3 requests, then exit 5.
+exits 5 quantic calendar
+! stdout .
+stderr 'rate limiting this address'
+grep -count=3 '^GET /api/v1/calendar' requests.log
+
+# Nothing listening: exit 3.
+env QUANTIC_URL=http://127.0.0.1:1
+exits 3 quantic calendar
+! stdout .
+stderr '^quantic: can''t reach Quantic at 127.0.0.1:1: '
+
+# Not a URL: wrong usage, exit 2.
+env QUANTIC_URL=quantic.finance
+exits 2 quantic calendar
+stderr 'QUANTIC_URL: "quantic.finance" isn''t an http or https URL'
+
+-- quantic/api/v1/calendar --
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+Retry-After: 0
+
+{"error": {"code": "rate_limited", "message": "Rate limited: try again shortly, or send a token."}}

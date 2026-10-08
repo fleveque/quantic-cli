@@ -1,0 +1,37 @@
+{
+  "schema": "quantic.cli/calendar/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "from": "2026-10-08",
+  "days": 7,
+  "items": [
+    {
+      "ex_date": "2026-10-08",
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "sector": "Technology",
+      "frequency": "quarterly"
+    },
+    {
+      "ex_date": "2026-10-08",
+      "symbol": "JNJ",
+      "name": "Johnson & Johnson",
+      "sector": "Healthcare",
+      "frequency": "quarterly"
+    },
+    {
+      "ex_date": "2026-10-09",
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "sector": "Technology",
+      "frequency": "quarterly"
+    },
+    {
+      "ex_date": "2026-10-10",
+      "symbol": "IBE.MC",
+      "name": "Iberdrola",
+      "sector": "Utilities",
+      "frequency": "semi_annual"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "quantic.cli/stock/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "symbol": "SPARSE",
+  "name": "Written   by    hand",
+  "currency": "EUR",
+  "sector": null,
+  "industry": null,
+  "instrument_type": null,
+  "price": {
+    "amount": "12.30",
+    "currency": "EUR",
+    "live": true,
+    "as_of": null
+  },
+  "dividend": {
+    "yield_pct": null,
+    "yield_avg_5y_pct": null,
+    "annual": {
+      "amount": "0.4812",
+      "currency": "EUR"
+    },
+    "frequency": null,
+    "payment_months": [],
+    "ex_date": null,
+    "cagr_5y": null,
+    "streak_years": null,
+    "safety": "unknown"
+  },
+  "scores": {
+    "rating": null,
+    "value": null,
+    "momentum": null
+  }
+}

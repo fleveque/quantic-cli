@@ -59,6 +59,18 @@ jobs:
         if: hashFiles('go.mod') != ''
         run: go vet ./...
 
+      # internal/api/api.gen.go must be what oapi-codegen makes from
+      # api/openapi.json today: a hand edit, or a spec updated without
+      # regenerating, fails here.
+      - name: Generated code is current
+        if: hashFiles('go.mod') != ''
+        run: |
+          go generate ./...
+          if ! git diff --exit-code; then
+            echo "::error::go generate ./... changed the files above; run it and commit the result."
+            exit 1
+          fi
+
       - name: Test
         if: hashFiles('go.mod') != ''
         run: go test -race ./...

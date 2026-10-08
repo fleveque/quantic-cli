@@ -1,0 +1,25 @@
+# One stock, and one Quantic doesn't track.
+
+exec quantic stock ko
+! stderr .
+stdout '^KO  Coca-Cola$'
+stdout '^Price +87.005 USD, as of 2026-10-08 15:00 UTC$'
+grep '^GET /api/v1/stocks/KO$' requests.log
+
+exits 1 quantic stock nopexx
+! stdout .
+stderr '^quantic: Quantic doesn''t track NOPEXX; try: quantic search NOPEXX$'
+
+exits 2 quantic stock
+! stdout .
+stderr 'accepts 1 arg\(s\), received 0'
+
+-- quantic/api/v1/stocks/KO --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"symbol": "KO", "name": "Coca-Cola", "currency": "USD",
+ "price": {"amount": "87.005", "currency": "USD", "live": false, "as_of": "2026-10-08T15:00:07Z"},
+ "sector": "Consumer Defensive", "industry": null, "instrument_type": "equity",
+ "dividend": {"payment_months": [4, 7, 10, 12], "safety": "safe", "yield_pct": 2.44},
+ "scores": {"rating": 5.0}}

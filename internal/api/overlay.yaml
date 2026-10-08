@@ -1,0 +1,32 @@
+# An OpenAPI Overlay: changes oapi-codegen applies to Quantic's document before
+# generating code, so api/openapi.json stays an exact copy of what the server
+# publishes.
+overlay: 1.0.0
+info:
+  title: quantic-cli's changes to Quantic's OpenAPI document
+  version: 1.0.0
+actions:
+  # The server names its operations after its controllers
+  # ("QuanticWeb.API.V1.CalendarController.index"), which would become
+  # QuanticWebAPIV1CalendarControllerIndexWithResponse in Go.
+  - target: $.paths['/api/v1/calendar'].get
+    update: {operationId: GetCalendar}
+  - target: $.paths['/api/v1/stocks'].get
+    update: {operationId: SearchStocks}
+  - target: $.paths['/api/v1/stocks/{symbol}'].get
+    update: {operationId: GetStock}
+  - target: $.paths['/api/v1/me'].get
+    update: {operationId: GetMe}
+  - target: $.paths['/api/v1/portfolios'].get
+    update: {operationId: ListPortfolios}
+  - target: $.paths['/api/v1/holdings'].get
+    update: {operationId: ListHoldings}
+  - target: $.paths['/api/v1/dividends'].get
+    update: {operationId: ListDividends}
+  - target: $.paths['/api/v1/income'].get
+    update: {operationId: GetIncome}
+
+  # A number with no format becomes a float32, which keeps about 7 digits:
+  # a growth rate of 0.044617420086995985 would lose most of them.
+  - target: $..[?(@.type == 'number')]
+    update: {format: double}
