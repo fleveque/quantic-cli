@@ -1,6 +1,7 @@
 # quantic-cli — design
 
-**Status:** draft, 2026-10-07. Nothing built yet.
+**Status:** draft, 2026-10-07. The server side of §2.1 is built (milestone S1, 2026-10-08); the CLI
+is not started.
 
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal and in scripts, plus an Omarchy bar widget built on it. It is also where I
@@ -63,6 +64,10 @@ small surface (below), only additive changes within v1, and an OpenAPI document 
 
 ### 2.1 The v1 surface
 
+**Built in S1**, all but `/upcoming` (Quantic PRs #482–#485). The reference for people is
+[quantic.finance/developers](https://quantic.finance/developers): getting a token, every endpoint,
+the conventions. For programs it's the OpenAPI document.
+
 Only what the CLI and widget need. Each endpoint mirrors an existing MCP tool, so the work is mostly
 a controller and a serializer.
 
@@ -76,7 +81,7 @@ a controller and a serializer.
 | `GET /api/v1/upcoming?days=&portfolio=` | token | **new** | your holdings' next ex-dates, pay dates, expected amounts |
 | `GET /api/v1/calendar?days=` | none | `dividend_calendar` | public, same 60/min anonymous limit |
 | `GET /api/v1/stocks/:symbol` | none or token | `get_stock` | richer when signed in, as in MCP |
-| `GET /api/v1/stocks?q=` | none | `search_stocks` | |
+| `GET /api/v1/stocks?q=` | none | `search_stocks` | MCP's `in_db` is `tracked` here |
 
 **`/upcoming` is the one genuinely new query**, and the reason the widget is worth having: "what is
 *my* next dividend". Today it can only be approximated by intersecting the public calendar with your
@@ -86,12 +91,18 @@ isn't, yet.
 
 **Conventions:**
 - Money as `{"amount": "12.34", "currency": "EUR"}`: decimal strings, never floats.
+- Rates that aren't money are plain numbers named for their unit: `_pct` is a percentage
+  (`yield_pct: 3.1`), any other rate a fraction (`growth_rate: 0.05`).
 - Dates as ISO 8601 (`2026-10-08`); timestamps in UTC.
 - Errors as `{"error": {"code": "unauthorized", "message": "…"}}` with the matching status: `401`
   for a bad token, `403` for a valid token without access, `404`, `422`, `429`.
+- A malformed parameter is `422 invalid_params`, never ignored; an out-of-range number is clamped
+  (`years=500` is 50).
 - Every response carries `ETag`; clients send `If-None-Match`.
-- An OpenAPI 3.1 document at `/api/v1/openapi.json`, generated from the controllers or written by
-  hand and tested against them. The CLI's client code is generated from it.
+- An OpenAPI document at `/api/v1/openapi.json`, generated from the controllers (`open_api_spex`),
+  and every response in Quantic's tests is asserted against it. The CLI's client code is generated
+  from it. It is **OpenAPI 3.0**, not the 3.1 first planned, because 3.0 is what `open_api_spex`
+  produces. `oapi-codegen` supports both.
 
 ---
 
@@ -308,8 +319,9 @@ dashboard adds `charmbracelet/bubbletea` and `lipgloss`. Everything else from th
   the diff.
 - **`testscript`** for end-to-end runs of the real binary: commands, exit codes, stdout and stderr in
   readable `.txtar` scripts. The Go tool itself is tested this way.
-- **Contract test** on the server side: the OpenAPI document is checked against the controllers in
-  Quantic's CI, so the API can't drift from what the CLI generated against.
+- **Contract test** on the server side: in Quantic's tests, every `/api/v1` response is asserted
+  against the OpenAPI document, and every routed endpoint must have an operation in it, so the API
+  can't drift from what the CLI generated against.
 - The widget, in its repository: `Model.js` parsing tested against this repo's golden `status` JSON;
   the QML checked by hand. When `status/v1` changes, the golden file is the signal for both.
 
@@ -322,7 +334,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | # | Milestone | Go ground covered |
 |---|---|---|
 | 0 | Repo, this design | — |
-| S1 | **Quantic (Elixir):** `/api/v1` for `me`, `portfolios`, `holdings`, `calendar`, OpenAPI doc | — (server work) |
+| S1 | **Quantic (Elixir):** `/api/v1`, all of §2.1 but `/upcoming`; OpenAPI doc. **Done** (#482–#485) | — (server work) |
 | 1 | Cobra skeleton: `version`, flags, `--json`, exit codes; `testscript` | Cobra, `io.Writer` design, testscript |
 | 2 | Generated client; `calendar`, `stock`, `search` signed out | OpenAPI codegen, `net/http`, `context` |
 | 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income` | interfaces for secrets, OS integration |

@@ -3,7 +3,8 @@
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal, and in scripts and status bars through `--json`.
 
-> **Status: design.** Nothing is built yet. Start with the [design](docs/design.md).
+> **Status: design.** The CLI isn't built yet; the API it reads is live, documented at
+> [quantic.finance/developers](https://quantic.finance/developers). Start with the [design](docs/design.md).
 
 ```
 quantic upcoming            # your holdings' next ex-dividend and payment dates
