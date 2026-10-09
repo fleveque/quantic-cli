@@ -1,0 +1,12 @@
+{
+  "portfolios": [
+    {
+      "default": true,
+      "name": "Main"
+    },
+    {
+      "default": false,
+      "name": "Pension"
+    }
+  ]
+}

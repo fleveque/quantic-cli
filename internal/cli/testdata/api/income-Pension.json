@@ -1,0 +1,127 @@
+{
+  "projection": [
+    {
+      "year_offset": 0,
+      "income": {
+        "currency": "EUR",
+        "amount": "1283.53"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "1182.80"
+      }
+    },
+    {
+      "year_offset": 1,
+      "income": {
+        "currency": "EUR",
+        "amount": "1283.53"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "1182.80"
+      }
+    },
+    {
+      "year_offset": 2,
+      "income": {
+        "currency": "EUR",
+        "amount": "1283.53"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "1182.80"
+      }
+    },
+    {
+      "year_offset": 3,
+      "income": {
+        "currency": "EUR",
+        "amount": "1283.53"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "1182.80"
+      }
+    },
+    {
+      "year_offset": 4,
+      "income": {
+        "currency": "EUR",
+        "amount": "1283.53"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "1182.80"
+      }
+    },
+    {
+      "year_offset": 5,
+      "income": {
+        "currency": "EUR",
+        "amount": "1283.53"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "1182.80"
+      }
+    }
+  ],
+  "holdings": [
+    {
+      "symbol": "IBE.MC",
+      "income": {
+        "currency": "EUR",
+        "amount": "612.00"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "612.00"
+      },
+      "cagr_5y": null,
+      "streak": null
+    },
+    {
+      "symbol": "VZ",
+      "income": {
+        "currency": "EUR",
+        "amount": "555.23"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "471.95"
+      },
+      "cagr_5y": null,
+      "streak": null
+    },
+    {
+      "symbol": "O",
+      "income": {
+        "currency": "EUR",
+        "amount": "116.29"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "98.85"
+      },
+      "cagr_5y": null,
+      "streak": null
+    }
+  ],
+  "years": 5,
+  "growth_rate": 0.0,
+  "drip": false,
+  "annual_income": {
+    "currency": "EUR",
+    "amount": "1283.53"
+  },
+  "net_annual_income": {
+    "currency": "EUR",
+    "amount": "1182.80"
+  },
+  "income_year": null,
+  "current_yield_pct": 4.25
+}

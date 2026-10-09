@@ -1,0 +1,19 @@
+{
+  "annual_income": {"amount": "120.00", "currency": "EUR"},
+  "net_annual_income": {"amount": "102.00", "currency": "EUR"},
+  "current_yield_pct": null,
+  "growth_rate": null,
+  "drip": false,
+  "years": 1,
+  "projection": [
+    {"year_offset": 0, "income": {"amount": "120.00", "currency": "EUR"}, "net_income": {"amount": "102.00", "currency": "EUR"}},
+    {"year_offset": 1, "income": {"amount": "120.00", "currency": "EUR"}, "net_income": {"amount": "102.00", "currency": "EUR"}}
+  ],
+  "income_year": {
+    "by_month": {"12": {"amount": "60.00", "currency": "EUR"}, "6": {"amount": "60.00", "currency": "EUR"}}
+  },
+  "holdings": [
+    {"symbol": "SMALL", "income": {"amount": "120.00", "currency": "EUR"}, "net_income": {"amount": "102.00", "currency": "EUR"},
+     "growth": null, "cagr_5y": null, "streak": null}
+  ]
+}

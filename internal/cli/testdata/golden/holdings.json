@@ -1,0 +1,125 @@
+{
+  "schema": "quantic.cli/holdings/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "portfolio": null,
+  "items": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "shares": "48",
+      "average_cost": {
+        "amount": "145.0000",
+        "currency": "USD"
+      },
+      "sector": "Technology",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "KO",
+      "name": "Coca-Cola",
+      "shares": "130",
+      "average_cost": {
+        "amount": "55.0000",
+        "currency": "USD"
+      },
+      "sector": "Consumer Defensive",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "O",
+      "name": "Realty Income",
+      "shares": "200",
+      "average_cost": {
+        "amount": "52.00",
+        "currency": "USD"
+      },
+      "sector": "Real Estate",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "JNJ",
+      "name": "Johnson & Johnson",
+      "shares": "36",
+      "average_cost": {
+        "amount": "150.00",
+        "currency": "USD"
+      },
+      "sector": "Healthcare",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "DGE.L",
+      "name": "Diageo plc",
+      "shares": "130",
+      "average_cost": {
+        "amount": "28.50",
+        "currency": "GBP"
+      },
+      "sector": "Consumer Defensive",
+      "instrument_type": "equity",
+      "isin": "GB0002374006",
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "SAN.MC",
+      "name": "Banco Santander",
+      "shares": "1300",
+      "average_cost": {
+        "amount": "3.80",
+        "currency": "EUR"
+      },
+      "sector": "Financial Services",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "VZ",
+      "name": "Verizon Communications",
+      "shares": "220",
+      "average_cost": {
+        "amount": "38.00",
+        "currency": "USD"
+      },
+      "sector": "Communication Services",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Pension"
+    },
+    {
+      "symbol": "IBE.MC",
+      "name": "Iberdrola",
+      "shares": "900",
+      "average_cost": {
+        "amount": "11.20",
+        "currency": "EUR"
+      },
+      "sector": "Utilities",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Pension"
+    },
+    {
+      "symbol": "O",
+      "name": "Realty Income",
+      "shares": "40",
+      "average_cost": {
+        "amount": "56.00",
+        "currency": "USD"
+      },
+      "sector": "Real Estate",
+      "instrument_type": "equity",
+      "isin": null,
+      "portfolio": "Pension"
+    }
+  ]
+}

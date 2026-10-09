@@ -1,0 +1,131 @@
+{
+  "schema": "quantic.cli/income/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "portfolio": "Pension",
+  "annual_income": {
+    "amount": "1283.53",
+    "currency": "EUR"
+  },
+  "net_annual_income": {
+    "amount": "1182.80",
+    "currency": "EUR"
+  },
+  "yield_pct": 4.25,
+  "growth_rate": 0,
+  "drip": false,
+  "years": 5,
+  "projection": [
+    {
+      "year": 0,
+      "income": {
+        "amount": "1283.53",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "1182.80",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 1,
+      "income": {
+        "amount": "1283.53",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "1182.80",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 2,
+      "income": {
+        "amount": "1283.53",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "1182.80",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 3,
+      "income": {
+        "amount": "1283.53",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "1182.80",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 4,
+      "income": {
+        "amount": "1283.53",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "1182.80",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 5,
+      "income": {
+        "amount": "1283.53",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "1182.80",
+        "currency": "EUR"
+      }
+    }
+  ],
+  "income_year": null,
+  "holdings": [
+    {
+      "symbol": "IBE.MC",
+      "income": {
+        "amount": "612.00",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "612.00",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "VZ",
+      "income": {
+        "amount": "555.23",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "471.95",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "O",
+      "income": {
+        "amount": "116.29",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "98.85",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    }
+  ]
+}

@@ -41,7 +41,7 @@ searched as one query, as if quoted.`,
 			if query == "" {
 				return usageError("the query is empty")
 			}
-			found, err := fetch(cmd, opts, func(ctx context.Context, c *api.Client) (*api.StockSearch, error) {
+			found, err := fetch(cmd, opts, tokenIfAny, func(ctx context.Context, c *api.Client) (*api.StockSearch, error) {
 				return c.SearchStocks(ctx, query)
 			})
 			if err != nil {

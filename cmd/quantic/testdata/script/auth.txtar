@@ -1,0 +1,86 @@
+# Signing in: login checks the token with Quantic and stores it in the
+# keyring, the next commands send it, and logout forgets it. The keyring here
+# is $WORK/keyring.json, never the system's (mainForTests).
+
+# Not signed in: exit 4, and nothing is asked of Quantic.
+exits 4 quantic auth status
+! stdout .
+stderr '^quantic: not signed in to 127\.0\.0\.1:\d+; run: quantic auth login \(or set QUANTIC_TOKEN\)$'
+exits 4 quantic holdings
+! exists requests.log
+
+# A script's stdin isn't a terminal: the token comes only with --with-token.
+stdin token.txt
+exits 2 quantic auth login
+stderr 'standard input isn''t a terminal; to read the token from it, add --with-token'
+
+stdin token.txt
+exec quantic auth login --with-token
+stdout '^Signed in to 127\.0\.0\.1:\d+ as Demo Investor <demo@demo\.quantic\.invalid>\.$'
+! stderr .
+grep '"quantic-cli/127\.0\.0\.1:\d+":"qtc_script"' keyring.json
+! exists config/quantic/tokens.json
+
+exec quantic auth status
+stdout '^Token +in the system keyring$'
+exec quantic portfolios
+stdout '^Main +yes +-$'
+grep -count=2 '^GET /api/v1/me Bearer qtc_script$' requests.log
+grep '^GET /api/v1/portfolios Bearer qtc_script$' requests.log
+
+# Public commands send it too.
+exec quantic calendar --days 7
+grep '^GET /api/v1/calendar\?days=7 Bearer qtc_script$' requests.log
+
+# QUANTIC_TOKEN wins over the stored token.
+env QUANTIC_TOKEN=qtc_from_env
+exec quantic auth status
+stdout '^Token +from QUANTIC_TOKEN$'
+grep '^GET /api/v1/me Bearer qtc_from_env$' requests.log
+env QUANTIC_TOKEN=
+
+exec quantic auth logout
+stdout '^Signed out of 127\.0\.0\.1:\d+\.$'
+stderr '^quantic: the token still works until you revoke it at http://127\.0\.0\.1:\d+/settings#api-tokens-settings$'
+! grep qtc_script keyring.json
+exits 4 quantic auth status
+
+# With no keyring, the token goes to a file only you can read, with a warning.
+env TEST_KEYRING=none
+stdin token.txt
+exec quantic auth login --with-token
+stderr '^quantic: no system keyring \(The name org\.freedesktop\.secrets was not provided by any \.service files\);$'
+stderr '^quantic: the token is in .*config/quantic/tokens\.json instead, readable only by you\.$'
+mode config/quantic 0700
+mode config/quantic/tokens.json 0600
+exec quantic auth status
+stdout '^Token +in a file \(no system keyring\)$'
+
+# A file others can read is refused, as ssh refuses such a key.
+chmod 0644 config/quantic/tokens.json
+exits 4 quantic auth status
+stderr 'tokens\.json can be read by other users \(mode 0644\); run chmod 600 on it'
+! stderr qtc_script
+
+# logout still removes it.
+exec quantic auth logout
+! exists config/quantic/tokens.json
+
+-- token.txt --
+qtc_script
+-- quantic/api/v1/me --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id": "fdc49e7c-8df6-4206-8cf8-6ab189d74e01", "name": "Demo Investor",
+ "email": "demo@demo.quantic.invalid", "preferred_currency": "EUR"}
+-- quantic/api/v1/portfolios --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"portfolios": [{"default": true, "name": "Main"}, {"default": false, "name": "Pension"}]}
+-- quantic/api/v1/calendar --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"from": "2026-10-09", "days": 7, "stocks": []}

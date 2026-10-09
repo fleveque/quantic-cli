@@ -1,0 +1,324 @@
+{
+  "schema": "quantic.cli/income/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "portfolio": null,
+  "annual_income": {
+    "amount": "2723.10",
+    "currency": "EUR"
+  },
+  "net_annual_income": {
+    "amount": "2465.54",
+    "currency": "EUR"
+  },
+  "yield_pct": 2.99,
+  "growth_rate": 0,
+  "drip": false,
+  "years": 5,
+  "projection": [
+    {
+      "year": 0,
+      "income": {
+        "amount": "2723.10",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "2465.54",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 1,
+      "income": {
+        "amount": "2723.10",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "2465.54",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 2,
+      "income": {
+        "amount": "2723.10",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "2465.54",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 3,
+      "income": {
+        "amount": "2723.10",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "2465.54",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 4,
+      "income": {
+        "amount": "2723.10",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "2465.54",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 5,
+      "income": {
+        "amount": "2723.10",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "2465.54",
+        "currency": "EUR"
+      }
+    }
+  ],
+  "income_year": {
+    "net_of_withholding": true,
+    "average_month": {
+      "amount": "205.46",
+      "currency": "EUR"
+    },
+    "by_month": [
+      {
+        "month": 1,
+        "income": {
+          "amount": "355.42",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 2,
+        "income": {
+          "amount": "177.24",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 3,
+        "income": {
+          "amount": "85.99",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 4,
+        "income": {
+          "amount": "136.17",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 5,
+        "income": {
+          "amount": "339.74",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 6,
+        "income": {
+          "amount": "85.99",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 7,
+        "income": {
+          "amount": "407.65",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 8,
+        "income": {
+          "amount": "177.24",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 9,
+        "income": {
+          "amount": "85.99",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 10,
+        "income": {
+          "amount": "136.17",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 11,
+        "income": {
+          "amount": "339.74",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 12,
+        "income": {
+          "amount": "138.22",
+          "currency": "EUR"
+        }
+      }
+    ],
+    "biggest_months": [
+      1,
+      5,
+      7
+    ],
+    "biggest_months_share": 0.447,
+    "thin_months": [
+      3,
+      6,
+      9,
+      4,
+      10,
+      12,
+      2,
+      8
+    ],
+    "empty_months": []
+  },
+  "holdings": [
+    {
+      "symbol": "IBE.MC",
+      "income": {
+        "amount": "612.00",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "612.00",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "O",
+      "income": {
+        "amount": "581.45",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "494.24",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "VZ",
+      "income": {
+        "amount": "555.23",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "471.95",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "SAN.MC",
+      "income": {
+        "amount": "325.00",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "325.00",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "KO",
+      "income": {
+        "amount": "245.78",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "208.91",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "JNJ",
+      "income": {
+        "amount": "172.08",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "146.27",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "O",
+      "income": {
+        "amount": "116.29",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "98.85",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "DGE.L",
+      "income": {
+        "amount": "69.03",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "69.03",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    },
+    {
+      "symbol": "AAPL",
+      "income": {
+        "amount": "46.23",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "39.30",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    }
+  ]
+}

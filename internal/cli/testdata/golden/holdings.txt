@@ -1,0 +1,10 @@
+SYMBOL  NAME                    SHARES  AVERAGE COST  PORTFOLIO
+AAPL    Apple Inc.                  48  145.0000 USD  Main
+KO      Coca-Cola                  130   55.0000 USD  Main
+O       Realty Income              200     52.00 USD  Main
+JNJ     Johnson & Johnson           36    150.00 USD  Main
+DGE.L   Diageo plc                 130     28.50 GBP  Main
+SAN.MC  Banco Santander           1300      3.80 EUR  Main
+VZ      Verizon Communications     220     38.00 USD  Pension
+IBE.MC  Iberdrola                  900     11.20 EUR  Pension
+O       Realty Income               40     56.00 USD  Pension

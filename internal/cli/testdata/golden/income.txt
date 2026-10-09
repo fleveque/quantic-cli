@@ -1,0 +1,29 @@
+Income      2723.10 EUR a year, 2465.54 EUR after withholding
+Yield       2.99%
+Growth      0.0% a year, weighted by income
+In 5 years  2723.10 EUR a year, 2465.54 EUR after withholding (at today's growth)
+
+By month, after withholding; 205.46 EUR on average
+Jan  355.42 EUR  █████████████████████
+Feb  177.24 EUR  ██████████
+Mar   85.99 EUR  █████
+Apr  136.17 EUR  ████████
+May  339.74 EUR  ████████████████████
+Jun   85.99 EUR  █████
+Jul  407.65 EUR  ████████████████████████
+Aug  177.24 EUR  ██████████
+Sep   85.99 EUR  █████
+Oct  136.17 EUR  ████████
+Nov  339.74 EUR  ████████████████████
+Dec  138.22 EUR  ████████
+
+SYMBOL      INCOME         NET  GROWTH  5Y CAGR  STREAK
+IBE.MC  612.00 EUR  612.00 EUR       -        -  -
+O       581.45 EUR  494.24 EUR       -        -  -
+VZ      555.23 EUR  471.95 EUR       -        -  -
+SAN.MC  325.00 EUR  325.00 EUR       -        -  -
+KO      245.78 EUR  208.91 EUR       -        -  -
+JNJ     172.08 EUR  146.27 EUR       -        -  -
+O       116.29 EUR   98.85 EUR       -        -  -
+DGE.L    69.03 EUR   69.03 EUR       -        -  -
+AAPL     46.23 EUR   39.30 EUR       -        -  -

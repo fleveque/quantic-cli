@@ -1,0 +1,4 @@
+Signed in to  QUANTIC_HOST
+As            Demo Investor <demo-u4hNjybg@demo.quantic.invalid>
+Currency      EUR
+Token         from QUANTIC_TOKEN

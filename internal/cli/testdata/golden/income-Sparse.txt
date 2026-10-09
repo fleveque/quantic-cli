@@ -1,0 +1,9 @@
+Income     120.00 EUR a year, 102.00 EUR after withholding
+In 1 year  120.00 EUR a year, 102.00 EUR after withholding (at today's growth)
+
+By month
+Jun  60.00 EUR  ████████████████████████
+Dec  60.00 EUR  ████████████████████████
+
+SYMBOL      INCOME         NET  GROWTH  5Y CAGR  STREAK
+SMALL   120.00 EUR  102.00 EUR       -        -  -

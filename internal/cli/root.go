@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+
+	"github.com/fleveque/quantic-cli/internal/auth"
 )
 
 // Options holds the global flags (design §3). Every command sees the same
@@ -24,7 +26,8 @@ type Options struct {
 	NoCache   bool
 	Timeout   time.Duration
 
-	userAgent string // "quantic-cli/<version>", sent with every request
+	userAgent string       // "quantic-cli/<version>", sent with every request
+	keyring   auth.Keyring // where `auth login` keeps the token
 }
 
 // defaultTimeout bounds one call to Quantic. Ten seconds is long for an API
@@ -35,7 +38,14 @@ const defaultTimeout = 10 * time.Second
 // Run executes the command line in args and returns the process exit code.
 // It never calls os.Exit, so tests can call it as often as they like.
 func Run(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build) int {
-	root := newRootCmd(build)
+	return RunWith(args, stdin, stdout, stderr, build, auth.SystemKeyring{})
+}
+
+// RunWith is Run with another keyring. The binary always uses the system's;
+// tests use one of their own, so they never touch the keyring of the
+// machine they run on.
+func RunWith(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build, keyring auth.Keyring) int {
+	root := newRootCmd(build, keyring)
 	root.SetArgs(args)
 	root.SetIn(stdin)
 	root.SetOut(stdout)
@@ -52,9 +62,9 @@ func Run(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build) 
 	return code
 }
 
-func newRootCmd(build Build) *cobra.Command {
+func newRootCmd(build Build, keyring auth.Keyring) *cobra.Command {
 	info, _ := debug.ReadBuildInfo()
-	opts := &Options{userAgent: "quantic-cli/" + build.withFallback(info).Version}
+	opts := &Options{userAgent: "quantic-cli/" + build.withFallback(info).Version, keyring: keyring}
 
 	root := &cobra.Command{
 		Use:   "quantic",
@@ -64,8 +74,11 @@ public dividend data, from https://quantic.finance. It only reads.
 
 Tables are for people; --json is for scripts and status bars.
 
+Sign in with a personal API token from Quantic's settings: quantic auth login.
+
 Environment:
-  QUANTIC_URL  where Quantic is (default https://quantic.finance)`,
+  QUANTIC_URL    where Quantic is (default https://quantic.finance)
+  QUANTIC_TOKEN  a token to use instead of the stored one, for scripts and CI`,
 
 		// Run prints errors itself, once, with the right exit code. Left on,
 		// Cobra would print each error a second time, and the whole usage
@@ -117,6 +130,11 @@ Environment:
 	flags.DurationVar(&opts.Timeout, "timeout", defaultTimeout, "give up on Quantic after this long")
 
 	root.AddCommand(
+		newAuthCmd(opts),
+		newPortfoliosCmd(opts),
+		newHoldingsCmd(opts),
+		newDividendsCmd(opts),
+		newIncomeCmd(opts),
 		newCalendarCmd(opts),
 		newStockCmd(opts),
 		newSearchCmd(opts),

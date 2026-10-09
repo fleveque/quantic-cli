@@ -4,21 +4,47 @@ import (
 	"bytes"
 	"encoding/json"
 	"maps"
+	"os"
 	"runtime"
 	"slices"
 	"strings"
 	"testing"
 
+	"github.com/fleveque/quantic-cli/internal/auth"
+	"github.com/fleveque/quantic-cli/internal/auth/authtest"
 	"github.com/fleveque/quantic-cli/internal/cli"
 )
 
+// TestMain keeps the tests away from the sign-in of whoever runs them: no
+// QUANTIC_TOKEN or QUANTIC_URL from their shell, and a config directory of
+// the tests' own, so no tokens.json is read or written in theirs.
+func TestMain(m *testing.M) {
+	os.Unsetenv("QUANTIC_TOKEN")
+	os.Unsetenv("QUANTIC_URL")
+	dir, err := os.MkdirTemp("", "quantic-cli-test-")
+	if err != nil {
+		panic(err)
+	}
+	os.Setenv("XDG_CONFIG_HOME", dir)
+	code := m.Run()
+	os.RemoveAll(dir)
+	os.Exit(code)
+}
+
 var release = cli.Build{Version: "v0.1.0", Commit: "abc1234", Date: "2026-10-08T10:00:00Z"}
 
-// run calls cli.Run the way main does, with buffers for the streams.
+// run runs the CLI the way main does, with buffers for the streams and an
+// empty keyring of its own: never the machine's.
 func run(t *testing.T, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
+	return runWith(t, &authtest.Keyring{}, "", args...)
+}
+
+// runWith is run with a keyring and what standard input holds.
+func runWith(t *testing.T, keyring auth.Keyring, stdin string, args ...string) (code int, stdout, stderr string) {
+	t.Helper()
 	var out, errOut bytes.Buffer
-	code = cli.Run(args, strings.NewReader(""), &out, &errOut, release)
+	code = cli.RunWith(args, strings.NewReader(stdin), &out, &errOut, release, keyring)
 	return code, out.String(), errOut.String()
 }
 

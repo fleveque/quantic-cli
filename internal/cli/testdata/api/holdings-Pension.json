@@ -1,0 +1,40 @@
+{
+  "holdings": [
+    {
+      "name": "Verizon Communications",
+      "symbol": "VZ",
+      "shares": "220",
+      "sector": "Communication Services",
+      "instrument_type": "equity",
+      "average_cost": {
+        "currency": "USD",
+        "amount": "38.00"
+      },
+      "isin": null
+    },
+    {
+      "name": "Iberdrola",
+      "symbol": "IBE.MC",
+      "shares": "900",
+      "sector": "Utilities",
+      "instrument_type": "equity",
+      "average_cost": {
+        "currency": "EUR",
+        "amount": "11.20"
+      },
+      "isin": null
+    },
+    {
+      "name": "Realty Income",
+      "symbol": "O",
+      "shares": "40",
+      "sector": "Real Estate",
+      "instrument_type": "equity",
+      "average_cost": {
+        "currency": "USD",
+        "amount": "56.00"
+      },
+      "isin": null
+    }
+  ]
+}

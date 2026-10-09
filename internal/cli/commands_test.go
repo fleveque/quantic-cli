@@ -1,13 +1,18 @@
 package cli_test
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -16,15 +21,44 @@ import (
 
 var update = flag.Bool("update", false, "rewrite testdata/golden from the current output")
 
+// testToken is the token the fake Quantic accepts.
+const testToken = "qtc_test"
+
+// private are the paths that need a token, as in Quantic.
+var private = []string{"/api/v1/me", "/api/v1/portfolios", "/api/v1/holdings", "/api/v1/dividends", "/api/v1/income"}
+
 // fakeQuantic serves testdata/api: GET /api/v1/calendar is calendar.json,
 // /api/v1/stocks/KO is stock-KO.json, /api/v1/stocks?q=coca is
-// search-coca.json. Anything else is Quantic's 404. QUANTIC_URL points at it
-// for the rest of the test.
-func fakeQuantic(t *testing.T) {
+// search-coca.json, /api/v1/holdings?portfolio=Pension is
+// holdings-Pension.json. The private paths answer 401 without
+// "Bearer qtc_test", and a portfolio with no file gets Quantic's 422.
+// Anything else is Quantic's 404. QUANTIC_URL points at it for the rest of
+// the test, and the requests it got are returned, as "GET /path?query", for
+// a test to check.
+func fakeQuantic(t *testing.T) *[]string {
 	t.Helper()
+	var mu sync.Mutex
+	var requests []string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		requests = append(requests, r.Method+" "+r.URL.String())
+		mu.Unlock()
+
+		w.Header().Set("Content-Type", "application/json")
+		if slices.Contains(private, r.URL.Path) && r.Header.Get("Authorization") != "Bearer "+testToken {
+			w.Header().Set("WWW-Authenticate", `Bearer realm="quantic"`)
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{"error":{"code":"unauthorized","message":"Missing or invalid bearer token."}}`))
+			return
+		}
+
 		var name string
 		switch {
+		case slices.Contains(private, r.URL.Path):
+			name = strings.TrimPrefix(r.URL.Path, "/api/v1/")
+			if p := r.URL.Query().Get("portfolio"); p != "" {
+				name += "-" + p
+			}
 		case r.URL.Path == "/api/v1/calendar":
 			name = "calendar"
 		case r.URL.Path == "/api/v1/stocks":
@@ -32,8 +66,13 @@ func fakeQuantic(t *testing.T) {
 		case strings.HasPrefix(r.URL.Path, "/api/v1/stocks/"):
 			name = "stock-" + strings.TrimPrefix(r.URL.Path, "/api/v1/stocks/")
 		}
-		w.Header().Set("Content-Type", "application/json")
 		body, err := os.ReadFile(filepath.Join("testdata", "api", name+".json"))
+		if err != nil && r.URL.Query().Has("portfolio") {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			msg := fmt.Sprintf("Unknown portfolio %q. Available portfolios: Main, Pension.", r.URL.Query().Get("portfolio"))
+			json.NewEncoder(w).Encode(map[string]any{"error": map[string]string{"code": "invalid_params", "message": msg}})
+			return
+		}
 		if name == "" || err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte(`{"error":{"code":"not_found","message":"Not found. Try /api/v1/stocks?q=."}}`))
@@ -43,6 +82,7 @@ func fakeQuantic(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 	t.Setenv("QUANTIC_URL", srv.URL)
+	return &requests
 }
 
 // fetchedAt is the one part of the output that changes on every run.
@@ -53,6 +93,7 @@ var fetchedAt = regexp.MustCompile(`"fetched_at": "[^"]+"`)
 // like code. `go test ./internal/cli -update` rewrites them.
 func TestGolden(t *testing.T) {
 	fakeQuantic(t)
+	t.Setenv("QUANTIC_TOKEN", testToken)
 	tests := []struct {
 		golden string
 		args   []string
@@ -66,6 +107,22 @@ func TestGolden(t *testing.T) {
 		{"search.txt", []string{"search", "coca"}},
 		{"search.json", []string{"search", "coca", "--json"}},
 		{"search-nothing.txt", []string{"search", "nothing", "at", "all"}},
+		{"auth-status.txt", []string{"auth", "status"}},
+		{"auth-status.json", []string{"auth", "status", "--json"}},
+		{"portfolios.txt", []string{"portfolios"}},
+		{"portfolios.json", []string{"portfolios", "--json"}},
+		{"holdings.txt", []string{"holdings"}},
+		{"holdings.json", []string{"holdings", "--json"}},
+		{"holdings-Pension.txt", []string{"holdings", "--portfolio", "Pension"}},
+		{"dividends.txt", []string{"dividends"}},
+		{"dividends.json", []string{"dividends", "--json"}},
+		{"income.txt", []string{"income", "--years", "5"}},
+		{"income.json", []string{"income", "--years", "5", "--json"}},
+		{"income-Pension.txt", []string{"income", "--years", "5", "--portfolio", "Pension"}},
+		{"income-Pension.json", []string{"income", "--years", "5", "--portfolio", "Pension", "--json"}},
+		// Hand-written: only two months, and none of the lists Quantic may leave out.
+		{"income-Sparse.txt", []string{"income", "--years", "1", "--portfolio", "Sparse"}},
+		{"income-Sparse.json", []string{"income", "--years", "1", "--portfolio", "Sparse", "--json"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.golden, func(t *testing.T) {
@@ -74,6 +131,8 @@ func TestGolden(t *testing.T) {
 				t.Fatalf("exit %d, stderr %q", code, stderr)
 			}
 			got := fetchedAt.ReplaceAllString(stdout, `"fetched_at": "FETCHED_AT"`)
+			// The fake Quantic's port is new every run.
+			got = strings.ReplaceAll(got, strings.TrimPrefix(os.Getenv("QUANTIC_URL"), "http://"), "QUANTIC_HOST")
 
 			path := filepath.Join("testdata", "golden", tt.golden)
 			if *update {
@@ -127,7 +186,7 @@ func TestAPIFailures(t *testing.T) {
 			w.WriteHeader(http.StatusTooManyRequests)
 			w.Write([]byte(`{"error":{"code":"rate_limited","message":"Rate limited: try again shortly, or send a token."}}`))
 		}, []string{"calendar"}, cli.ExitRateLimited,
-			"quantic: Quantic is rate limiting this address (60 calls a minute without signing in); try again in a minute\n"},
+			"quantic: Quantic is rate limiting this address (60 calls a minute without signing in); try again in a minute, or sign in: quantic auth login\n"},
 		{"server error", func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusBadGateway)
 		}, []string{"calendar"}, cli.ExitFailed,
@@ -188,6 +247,11 @@ func TestCommandUsage(t *testing.T) {
 		{[]string{"stock", " "}, "the symbol is empty"},
 		{[]string{"search"}, "requires at least 1 arg(s), only received 0"},
 		{[]string{"search", "  "}, "the query is empty"},
+		{[]string{"dividends", "--from", "2026-13-01"}, `--from "2026-13-01" isn't a date like 2026-01-31`},
+		{[]string{"dividends", "--to", "yesterday"}, `--to "yesterday" isn't a date like 2026-01-31`},
+		{[]string{"dividends", "--from", "2026-02-01", "--to", "2026-01-01"}, "--to (2026-01-01) is before --from (2026-02-01)"},
+		{[]string{"income", "--years", "0"}, "--years must be at least 1, got 0"},
+		{[]string{"holdings", "KO"}, `unknown command "KO" for "quantic holdings"`},
 	}
 	for _, tt := range tests {
 		t.Run(strings.Join(tt.args, " "), func(t *testing.T) {
@@ -205,5 +269,33 @@ func TestBadQuanticURL(t *testing.T) {
 	code, _, stderr := run(t, "calendar")
 	if code != cli.ExitUsage || !strings.Contains(stderr, `QUANTIC_URL: "quantic.finance" isn't an http or https URL`) {
 		t.Errorf("exit %d, stderr %q", code, stderr)
+	}
+}
+
+// A portfolio Quantic doesn't know is wrong usage, and its message lists the
+// ones it does.
+func TestUnknownPortfolio(t *testing.T) {
+	fakeQuantic(t)
+	t.Setenv("QUANTIC_TOKEN", testToken)
+	for _, cmd := range []string{"holdings", "dividends", "income"} {
+		code, stdout, stderr := run(t, cmd, "--portfolio", "nope")
+		if code != cli.ExitUsage || stdout != "" ||
+			stderr != "quantic: Unknown portfolio \"nope\". Available portfolios: Main, Pension.\nRun 'quantic --help' for usage.\n" {
+			t.Errorf("%s: exit %d, stdout %q, stderr %q", cmd, code, stdout, stderr)
+		}
+	}
+}
+
+// The filters reach Quantic as its parameters, the symbol in capitals.
+func TestDividendsFilters(t *testing.T) {
+	requests := fakeQuantic(t)
+	t.Setenv("QUANTIC_TOKEN", testToken)
+	code, _, stderr := run(t, "dividends", "--symbol", "ko", "--from", "2026-01-01", "--to", "2026-06-30")
+	if code != cli.ExitOK {
+		t.Fatalf("exit %d, stderr %q", code, stderr)
+	}
+	u, _ := url.Parse(strings.TrimPrefix((*requests)[0], "GET "))
+	if got := u.Query().Encode(); u.Path != "/api/v1/dividends" || got != "from=2026-01-01&symbol=KO&to=2026-06-30" {
+		t.Errorf("requested %s", (*requests)[0])
 	}
 }
