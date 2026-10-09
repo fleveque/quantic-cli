@@ -93,6 +93,8 @@ review their diff like code.
 The API client in `internal/api/api.gen.go` is generated from `api/openapi.json`, a copy of
 Quantic's OpenAPI document ([ADR 0002](docs/decisions/0002-generated-client-from-a-checked-in-spec.md)).
 After updating the copy, run `go generate ./...` and commit both; CI fails if they don't match.
+The document is used as published, with no local patches: operation names and number formats are
+set on the server.
 
 Tests use recorded public responses or hand-written ones, never real portfolio data.
 

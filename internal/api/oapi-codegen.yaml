@@ -5,8 +5,6 @@ generate:
   models: true
   client: true
 output-options:
-  overlay:
-    path: overlay.yaml
   # The generated client is unexported: commands use Client in client.go.
   client-type-name: genClient
   user-templates:

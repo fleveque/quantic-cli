@@ -335,7 +335,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | # | Milestone | Go ground covered |
 |---|---|---|
 | 0 | Repo, this design | — |
-| S1 | **Quantic (Elixir):** `/api/v1`, all of §2.1 but `/upcoming`; OpenAPI doc. **Done** (#482–#485) | — (server work) |
+| S1 | **Quantic (Elixir):** `/api/v1`, all of §2.1 but `/upcoming`; OpenAPI doc. **Done** (#482–#485; operation names and number formats #488) | — (server work) |
 | 1 | Cobra skeleton: `version`, flags, `--json`, exit codes; `testscript`. **Done** (#5) | Cobra, `io.Writer` design, testscript |
 | 2 | Generated client; `calendar`, `stock`, `search` signed out. **Done** (#6, [ADR 0002](decisions/0002-generated-client-from-a-checked-in-spec.md)) | OpenAPI codegen, `net/http`, `context` |
 | 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income` | interfaces for secrets, OS integration |

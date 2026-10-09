@@ -23,10 +23,11 @@ Two things in the document as Quantic serves it don't suit Go:
   fetches anything.
 - **`internal/api/overlay.yaml`**, an [OpenAPI Overlay](https://spec.openapis.org/overlay/v1.0.0.html),
   renames the operations and makes every number a `double` before generation. The copy stays exactly
-  what the server publishes, and every change to it is in one reviewed file.
+  what the server publishes, and every change to it is in one reviewed file. *Removed 2026-10-09:
+  see the update below.*
 - **`internal/api/api.gen.go` is committed**, and `oapi-codegen` is a `tool` in `go.mod`
   (`go tool oapi-codegen`), pinned like any dependency. CI runs `go generate ./...` and fails if
-  anything changes, so the committed code is always what the document and the overlay produce.
+  anything changes, so the committed code is always what the document produces.
 - The generated client is unexported (`genClient`). The commands use `internal/api`'s `Client`:
   one method per endpoint, typed errors (`StatusError`, `UnreachableError`), and the 429 retry
   (design §7) in an `http.RoundTripper` the generated code never sees.
@@ -46,9 +47,13 @@ Two things in the document as Quantic serves it don't suit Go:
   needs it.
 - `go.mod` lists the generator's own dependencies (about 20 indirect lines), because a `tool` is a
   dependency of the module.
-- The overlay is CLI-side. Better operation names and `format: double` on the server
-  (`open_api_spex` supports both) would help every client generator; that's a server change for
-  the author to decide, and the overlay can shrink when it happens.
+- The overlay was CLI-side: it fixed the names and numbers for this client only. See the update.
+
+**Update, 2026-10-09: the fix moved to the server.** Quantic now names every operation
+(`operation_id:`) and gives every number `format: :double`, and its `spec_test.exs` fails if a new
+operation or number leaves them out ([quantic#488](https://github.com/fleveque/quantic/pull/488)).
+Generating from the new document without the overlay produced the same `api.gen.go`, byte for byte,
+so the overlay is gone and `api/openapi.json` is again all `oapi-codegen` reads.
 
 **Rejected alternative — generate at build time from the live document.** Builds would depend on the
 network and on whatever the server published that minute, and a breaking change would show up as a

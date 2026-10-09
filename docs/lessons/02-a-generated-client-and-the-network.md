@@ -116,6 +116,13 @@ internal/cli/stock.go:110:19: cannot use s.Dividend.Cagr5y (variable of type *fl
 In Elixir, a float is a float, and the precision question never comes up. In Go the size is part of
 the type, and a generator has to pick one.
 
+**Afterwards, the overlay went away.** Both problems were really the server's document being vague,
+and I own the server. So Quantic now names each operation and says `format: double` on each number,
+with a test that a new endpoint can't forget either
+([quantic#488](https://github.com/fleveque/quantic/pull/488)). I regenerated from the new document
+with no overlay and got the same `api.gen.go`, byte for byte, then deleted `overlay.yaml`. An overlay
+is the tool for a document you can't change; for your own, fix the source.
+
 ## A pointer means "maybe"
 
 A field the document marks `nullable` comes out as a pointer: `Name *string`. That's how Go spells
@@ -334,7 +341,8 @@ Each guarantee, broken once, and what caught it. All of them were run against th
 
 - Generate the client from the server's own document, commit the result, and let CI check it's
   current. `go tool` pins the generator without putting it in the binary.
-- Read what the generator chose. `number` became `float32`, and only the types caught it.
+- Read what the generator chose. `number` became `float32`, and only the types caught it. When
+  the document is yours, fix it there rather than patching it in the client.
 - In Go, "maybe" is a pointer, asked for field by field. `omitempty` decides whether `nil` is
   `null` or missing, and a contract should say which.
 - An `http.Client` is a `RoundTripper` with extras, and a `RoundTripper` wrapping another is
