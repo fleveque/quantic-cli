@@ -14,7 +14,10 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 - Milestone 1 is done (#5): Cobra skeleton, `version`, global flags, exit codes, testscript.
 - Milestone 2 is done (#6): the generated client (ADR 0002) and `calendar`, `stock`, `search`
   signed out. Quantic now names its operations and formats its numbers (quantic#488), so the client
-  is generated from its document with no overlay. Next is milestone 3, when the author says.
+  is generated from its document with no overlay.
+- Milestone 3 (in review): `auth login`/`logout`/`status` with the keyring (ADR 0003), and
+  `portfolios`, `holdings`, `dividends`, `income`; lesson 03 and walkthrough 03. Next is milestone 4,
+  when the author says.
 
 ## Conventions
 
@@ -48,6 +51,10 @@ These are quantic-agent's, on purpose: the same way of working, on a second Go p
   Quantic demo user or are written by hand.
 - **The token** comes from the keyring or `QUANTIC_TOKEN`, never a flag, and never appears in output,
   logs, cache files or errors.
+- **No test touches the system keyring.** Tests run the CLI through `cli.RunWith` with a keyring
+  from `internal/auth/authtest`; clearing the environment is not enough, and neither is a private
+  `dbus-run-session`: its gnome-keyring finds the author's running one (ADR 0003). Running
+  `auth login` against the real keyring by hand needs the author's go-ahead.
 - **Nothing machine-specific in the binary**: `QUANTIC_URL` and flags, never a hard-coded path.
 - **Questions are not decisions.** When the author asks something, answer it; ask before turning it
   into a design change.

@@ -18,12 +18,11 @@ import (
 //
 // encoding/json, and log/slog's JSON handler, can't see an unexported field,
 // so to them a Secret is {}. fmt can: it reads unexported fields through
-// reflection, which is what Format below is for.
+// reflection. What stops it is the pointer below.
 type Secret struct {
-	// Behind a pointer, for the one case Format can't cover: fmt can't call
-	// a method through an unexported field, so a Secret in one, printed with
-	// %+v, is printed field by field. A pointer below the top level is
-	// printed as its address, so even then the token isn't.
+	// Behind a pointer because fmt prints a pointer below the top level as
+	// its address: whatever the verb, and however deep a Secret is nested,
+	// fmt shows 0xc000…, never the token. Format makes that [redacted].
 	value *string
 }
 
@@ -55,7 +54,7 @@ func (s Secret) IsZero() bool { return s.value == nil }
 
 const redacted = "[redacted]"
 
-// Format is fmt's hook for every verb: %v, %s, %q, %x, %d, %+v, %#v. Even a
-// struct holding a Secret, printed with %+v, shows [redacted] in its place.
-// log/slog's text handler prints with fmt, so this covers it too.
+// Format is fmt's hook for every verb, so an error message that includes a
+// Secret says [redacted] rather than an address. fmt can't call it through
+// an unexported field of another struct; there, the pointer shows instead.
 func (Secret) Format(f fmt.State, _ rune) { io.WriteString(f, redacted) }

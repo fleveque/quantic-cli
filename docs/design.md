@@ -1,7 +1,7 @@
 # quantic-cli — design
 
 **Status:** draft, 2026-10-07. The server side of §2.1 is built (milestone S1, 2026-10-08). The CLI
-has its skeleton and the public commands (milestones 1–2).
+has its skeleton, the public commands, and signing in with your own portfolio (milestones 1–3).
 
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal and in scripts, plus an Omarchy bar widget built on it. It is also where I
@@ -116,7 +116,7 @@ quantic auth status                   # who you are; exit 4 if not signed in
 quantic portfolios
 quantic holdings      [--portfolio NAME]
 quantic dividends     [--symbol S] [--from D] [--to D] [--portfolio NAME]
-quantic income        [--portfolio NAME] [--years N]
+quantic income        [--portfolio NAME] [--years N] [--drip]
 quantic upcoming      [--days N] [--portfolio NAME]
 
 quantic calendar      [--days N]      # public: works signed out
@@ -150,6 +150,11 @@ The same pattern as `gh auth login --with-token`. The token is stored in the sys
 Service on Linux, Keychain on macOS) via `zalando/go-keyring`. If no keyring is available, it falls
 back to a `0600` file under `$XDG_CONFIG_HOME/quantic/`, with a warning. `QUANTIC_TOKEN` overrides
 both. The token never appears in flags, logs, cache files or error messages.
+
+**As built (milestone 3, [ADR 0003](decisions/0003-where-the-token-lives.md)):** one token per
+Quantic host, so a local server's never replaces production's. `login` checks the token with
+`/api/v1/me` before storing it. The file is `tokens.json`, and a token in it is refused while others
+can read it. Every command sends the token when there is one, public ones included.
 
 **Later: browser login.** OAuth 2.1 with PKCE and a loopback redirect (`http://127.0.0.1:<port>`,
 RFC 8252), the usual way for a desktop CLI. Quantic already runs an OAuth server with dynamic client
@@ -297,7 +302,7 @@ api/openapi.json        a copy of Quantic's OpenAPI document (ADR 0002)
 cmd/quantic/            main: wiring only
 internal/cli/           Cobra commands, flags, exit codes
 internal/api/           client generated from Quantic's OpenAPI document, plus a thin wrapper
-internal/auth/          keyring, QUANTIC_TOKEN, the file fallback
+internal/auth/          keyring, QUANTIC_TOKEN, the file fallback; authtest/ has keyrings for tests
 internal/cache/         files, freshness, ETags, per-entry locks
 internal/render/        tables (text/tabwriter) and JSON output types
 internal/status/        the concurrent composition behind `quantic status`
@@ -338,7 +343,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | S1 | **Quantic (Elixir):** `/api/v1`, all of §2.1 but `/upcoming`; OpenAPI doc. **Done** (#482–#485; operation names and number formats #488) | — (server work) |
 | 1 | Cobra skeleton: `version`, flags, `--json`, exit codes; `testscript`. **Done** (#5) | Cobra, `io.Writer` design, testscript |
 | 2 | Generated client; `calendar`, `stock`, `search` signed out. **Done** (#6, [ADR 0002](decisions/0002-generated-client-from-a-checked-in-spec.md)) | OpenAPI codegen, `net/http`, `context` |
-| 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income` | interfaces for secrets, OS integration |
+| 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income`. **Done** (#8, [ADR 0003](decisions/0003-where-the-token-lives.md)) | interfaces for secrets, OS integration |
 | 4 | Cache: freshness, ETags, offline, locks | files, `encoding/json`, `flock`, time |
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts | — |
 | 5 | `upcoming` and `status`, concurrently | `errgroup`, partial failure |
