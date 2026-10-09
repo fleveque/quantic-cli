@@ -8,6 +8,10 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	openapi_types "github.com/oapi-codegen/runtime/types"
+
+	"github.com/fleveque/quantic-cli/internal/auth"
 )
 
 // serve answers every request with status and body, and remembers the last
@@ -160,5 +164,67 @@ func TestNewRejectsWhatIsntAnHTTPURL(t *testing.T) {
 		if _, err := New(Config{BaseURL: base}); err == nil {
 			t.Errorf("New(%q) = nil error", base)
 		}
+	}
+}
+
+// The token goes in the Authorization header, and only when there is one.
+func TestToken(t *testing.T) {
+	var got []string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = append(got, r.Header.Get("Authorization"))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"portfolios":[]}`))
+	}))
+	t.Cleanup(srv.Close)
+
+	token, _ := auth.ParseSecret("qtc_one")
+	for _, cfg := range []Config{{BaseURL: srv.URL, Token: token}, {BaseURL: srv.URL}} {
+		c, err := New(cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := c.Portfolios(t.Context()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(got) != 2 || got[0] != "Bearer qtc_one" || got[1] != "" {
+		t.Errorf("Authorization headers = %q, want [Bearer qtc_one, none]", got)
+	}
+}
+
+// A redirect to another host doesn't take the token with it: net/http drops
+// Authorization when a redirect leaves the host it was set for.
+func TestTokenStaysWithItsHost(t *testing.T) {
+	var elsewhere string
+	other := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		elsewhere = r.Header.Get("Authorization")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"portfolios":[]}`))
+	}))
+	t.Cleanup(other.Close)
+	// 127.0.0.1 and localhost are different hosts to net/http.
+	otherURL := strings.Replace(other.URL, "127.0.0.1", "localhost", 1)
+	quantic := httptest.NewServer(http.RedirectHandler(otherURL+"/api/v1/portfolios", http.StatusFound))
+	t.Cleanup(quantic.Close)
+
+	token, _ := auth.ParseSecret("qtc_one")
+	c, _ := New(Config{BaseURL: quantic.URL, Token: token})
+	if _, err := c.Portfolios(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if elsewhere != "" {
+		t.Errorf("the other host got Authorization: %q", elsewhere)
+	}
+}
+
+func TestQueryParameters(t *testing.T) {
+	c, req := serve(t, 200, "application/json", `{"dividends":[]}`)
+	symbol, portfolio := "KO", "Main"
+	from := openapi_types.Date{Time: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)}
+	if _, err := c.Dividends(t.Context(), ListDividendsParams{Symbol: &symbol, From: &from, Portfolio: &portfolio}); err != nil {
+		t.Fatal(err)
+	}
+	if got := req.URL.Query().Encode(); got != "from=2026-01-01&portfolio=Main&symbol=KO" {
+		t.Errorf("query = %s", got)
 	}
 }

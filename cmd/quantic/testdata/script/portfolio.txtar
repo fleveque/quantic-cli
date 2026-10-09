@@ -1,0 +1,62 @@
+# Your own data, signed in with QUANTIC_TOKEN: each command asks for its one
+# endpoint, with the token and the flags as Quantic's parameters.
+
+env QUANTIC_TOKEN=qtc_script
+
+exec quantic holdings --portfolio Pension
+stdout '^SYMBOL +NAME +SHARES +AVERAGE COST$'
+stdout '^VZ +Verizon Communications +220 +38\.00 USD$'
+! stdout PORTFOLIO
+grep '^GET /api/v1/holdings\?portfolio=Pension Bearer qtc_script$' requests.log
+
+exec quantic dividends --symbol vz --from 2026-01-01 --json
+stdout '"symbol": "VZ"'
+stdout '"gross": \{\n +"amount": "99\.00",\n +"currency": "USD"'
+grep '^GET /api/v1/dividends\?symbol=VZ&from=2026-01-01 Bearer qtc_script$' requests.log
+
+exec quantic income --years 3 --drip
+stdout '^Income +1283\.53 EUR a year, 1182\.80 EUR after withholding$'
+stdout '^In 3 years +1283\.53 EUR a year, 1182\.80 EUR after withholding \(at today''s growth, dividends reinvested\)$'
+grep '^GET /api/v1/income\?years=3&drip=true Bearer qtc_script$' requests.log
+
+# An unknown portfolio is wrong usage; Quantic's message lists the right ones.
+exits 2 quantic holdings --portfolio nope
+stderr '^quantic: Unknown portfolio "nope"\. Available portfolios: Main, Pension\.'
+
+# A revoked token: exit 4, and what to do about it.
+env QUANTIC_TOKEN=qtc_revoked
+exits 4 quantic income
+stderr 'rejected the token in QUANTIC_TOKEN; it may have been revoked\. Make a new one at http://127\.0\.0\.1:\d+/settings#api-tokens-settings$'
+! stderr qtc_revoked
+
+-- quantic/tokens --
+qtc_script
+-- quantic/api/v1/holdings?portfolio=nope --
+HTTP/1.1 422 Unprocessable Entity
+Content-Type: application/json
+
+{"error": {"code": "invalid_params", "message": "Unknown portfolio \"nope\". Available portfolios: Main, Pension. Omit the portfolio param to aggregate across all of them."}}
+-- quantic/api/v1/holdings --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"holdings": [
+  {"symbol": "VZ", "name": "Verizon Communications", "shares": "220", "sector": "Communication Services",
+   "instrument_type": "equity", "average_cost": {"amount": "38.00", "currency": "USD"}, "isin": null}]}
+-- quantic/api/v1/dividends --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"dividends": [
+  {"date": "2026-08-15", "symbol": "VZ", "name": "Verizon Communications", "source": "manual",
+   "amount": {"amount": "99.00", "currency": "USD"}, "net": {"amount": "84.15", "currency": "USD"},
+   "withholding_tax": {"amount": "14.85", "currency": "USD"}, "per_share_amount": {"amount": "0.45", "currency": "USD"},
+   "quantity": 220, "portfolio": "Pension", "isin": null}]}
+-- quantic/api/v1/income --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"annual_income": {"amount": "1283.53", "currency": "EUR"}, "net_annual_income": {"amount": "1182.80", "currency": "EUR"},
+ "current_yield_pct": 4.25, "growth_rate": 0.0, "drip": true, "years": 3, "income_year": null, "holdings": [],
+ "projection": [{"year_offset": 0, "income": {"amount": "1283.53", "currency": "EUR"}, "net_income": {"amount": "1182.80", "currency": "EUR"}},
+                {"year_offset": 3, "income": {"amount": "1283.53", "currency": "EUR"}, "net_income": {"amount": "1182.80", "currency": "EUR"}}]}

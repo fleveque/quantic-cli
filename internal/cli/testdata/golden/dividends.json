@@ -1,0 +1,261 @@
+{
+  "schema": "quantic.cli/dividends/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "symbol": null,
+  "from": null,
+  "to": null,
+  "portfolio": null,
+  "items": [
+    {
+      "date": "2026-10-15",
+      "symbol": "O",
+      "name": "Realty Income",
+      "gross": {
+        "amount": "18.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "2.70",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "15.30",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 40,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Pension"
+    },
+    {
+      "date": "2026-10-15",
+      "symbol": "DGE.L",
+      "name": "Diageo plc",
+      "gross": {
+        "amount": "58.50",
+        "currency": "GBP"
+      },
+      "withholding_tax": {
+        "amount": "8.78",
+        "currency": "GBP"
+      },
+      "net": {
+        "amount": "49.72",
+        "currency": "GBP"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "GBP"
+      },
+      "shares": 130,
+      "source": "manual",
+      "isin": "GB0002374006",
+      "portfolio": "Main"
+    },
+    {
+      "date": "2026-10-15",
+      "symbol": "O",
+      "name": "Realty Income",
+      "gross": {
+        "amount": "90.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "13.50",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "76.50",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 200,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "date": "2026-10-15",
+      "symbol": "KO",
+      "name": "Coca-Cola",
+      "gross": {
+        "amount": "58.50",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "8.78",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "49.72",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 130,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "date": "2026-09-15",
+      "symbol": "O",
+      "name": "Realty Income",
+      "gross": {
+        "amount": "18.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "2.70",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "15.30",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 40,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Pension"
+    },
+    {
+      "date": "2026-09-15",
+      "symbol": "JNJ",
+      "name": "Johnson & Johnson",
+      "gross": {
+        "amount": "16.20",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "2.43",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "13.77",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 36,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "date": "2026-09-15",
+      "symbol": "O",
+      "name": "Realty Income",
+      "gross": {
+        "amount": "90.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "13.50",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "76.50",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 200,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Main"
+    },
+    {
+      "date": "2026-08-15",
+      "symbol": "O",
+      "name": "Realty Income",
+      "gross": {
+        "amount": "18.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "2.70",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "15.30",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 40,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Pension"
+    },
+    {
+      "date": "2026-08-15",
+      "symbol": "VZ",
+      "name": "Verizon Communications",
+      "gross": {
+        "amount": "99.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "14.85",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "84.15",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 220,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Pension"
+    },
+    {
+      "date": "2026-08-15",
+      "symbol": "O",
+      "name": "Realty Income",
+      "gross": {
+        "amount": "90.00",
+        "currency": "USD"
+      },
+      "withholding_tax": {
+        "amount": "13.50",
+        "currency": "USD"
+      },
+      "net": {
+        "amount": "76.50",
+        "currency": "USD"
+      },
+      "per_share": {
+        "amount": "0.45",
+        "currency": "USD"
+      },
+      "shares": 200,
+      "source": "manual",
+      "isin": null,
+      "portfolio": "Main"
+    }
+  ]
+}

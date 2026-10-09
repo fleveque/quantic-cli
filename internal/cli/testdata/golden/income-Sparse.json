@@ -1,0 +1,82 @@
+{
+  "schema": "quantic.cli/income/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "portfolio": "Sparse",
+  "annual_income": {
+    "amount": "120.00",
+    "currency": "EUR"
+  },
+  "net_annual_income": {
+    "amount": "102.00",
+    "currency": "EUR"
+  },
+  "yield_pct": null,
+  "growth_rate": null,
+  "drip": false,
+  "years": 1,
+  "projection": [
+    {
+      "year": 0,
+      "income": {
+        "amount": "120.00",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "102.00",
+        "currency": "EUR"
+      }
+    },
+    {
+      "year": 1,
+      "income": {
+        "amount": "120.00",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "102.00",
+        "currency": "EUR"
+      }
+    }
+  ],
+  "income_year": {
+    "net_of_withholding": false,
+    "average_month": null,
+    "by_month": [
+      {
+        "month": 6,
+        "income": {
+          "amount": "60.00",
+          "currency": "EUR"
+        }
+      },
+      {
+        "month": 12,
+        "income": {
+          "amount": "60.00",
+          "currency": "EUR"
+        }
+      }
+    ],
+    "biggest_months": [],
+    "biggest_months_share": null,
+    "thin_months": [],
+    "empty_months": []
+  },
+  "holdings": [
+    {
+      "symbol": "SMALL",
+      "income": {
+        "amount": "120.00",
+        "currency": "EUR"
+      },
+      "net_income": {
+        "amount": "102.00",
+        "currency": "EUR"
+      },
+      "growth": null,
+      "cagr_5y": null,
+      "streak_years": null
+    }
+  ]
+}

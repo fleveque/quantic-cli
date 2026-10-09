@@ -1,0 +1,17 @@
+{
+  "schema": "quantic.cli/portfolios/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "items": [
+    {
+      "name": "Main",
+      "default": true,
+      "slug": null
+    },
+    {
+      "name": "Pension",
+      "default": false,
+      "slug": null
+    }
+  ]
+}

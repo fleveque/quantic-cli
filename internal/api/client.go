@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/fleveque/quantic-cli/internal/auth"
 )
 
 // Client is what the commands call: one method per endpoint, each returning
@@ -25,6 +27,11 @@ type Config struct {
 
 	// UserAgent names the client in Quantic's logs, e.g. "quantic-cli/v0.1.0".
 	UserAgent string
+
+	// Token is sent as "Authorization: Bearer …" on every request; zero
+	// means signed out. Go's http.Client drops the header if a redirect
+	// leads to another host, so it only ever goes to BaseURL's.
+	Token auth.Secret
 
 	// Transport sends the requests; nil means http.DefaultTransport. Tests
 	// replace it to count or break requests.
@@ -54,6 +61,9 @@ func New(cfg Config) (*Client, error) {
 			req.Header.Set("Accept", "application/json")
 			if cfg.UserAgent != "" {
 				req.Header.Set("User-Agent", cfg.UserAgent)
+			}
+			if !cfg.Token.IsZero() {
+				req.Header.Set("Authorization", "Bearer "+cfg.Token.Reveal())
 			}
 			return nil
 		}),
@@ -87,6 +97,54 @@ func (c *Client) Stock(ctx context.Context, symbol string) (*Stock, error) {
 // name. Public.
 func (c *Client) SearchStocks(ctx context.Context, query string) (*StockSearch, error) {
 	resp, err := c.gen.SearchStocksWithResponse(ctx, &SearchStocksParams{Q: query})
+	if err != nil {
+		return nil, c.requestError(err)
+	}
+	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
+}
+
+// Me is GET /api/v1/me: who the token belongs to. Needs a token.
+func (c *Client) Me(ctx context.Context) (*Me, error) {
+	resp, err := c.gen.GetMeWithResponse(ctx)
+	if err != nil {
+		return nil, c.requestError(err)
+	}
+	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
+}
+
+// Portfolios is GET /api/v1/portfolios. Needs a token.
+func (c *Client) Portfolios(ctx context.Context) (*PortfolioList, error) {
+	resp, err := c.gen.ListPortfoliosWithResponse(ctx)
+	if err != nil {
+		return nil, c.requestError(err)
+	}
+	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
+}
+
+// Holdings is GET /api/v1/holdings, in every portfolio or the one named.
+// Needs a token.
+func (c *Client) Holdings(ctx context.Context, params ListHoldingsParams) (*HoldingList, error) {
+	resp, err := c.gen.ListHoldingsWithResponse(ctx, &params)
+	if err != nil {
+		return nil, c.requestError(err)
+	}
+	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
+}
+
+// Dividends is GET /api/v1/dividends: dividends received, newest first.
+// Needs a token.
+func (c *Client) Dividends(ctx context.Context, params ListDividendsParams) (*DividendList, error) {
+	resp, err := c.gen.ListDividendsWithResponse(ctx, &params)
+	if err != nil {
+		return nil, c.requestError(err)
+	}
+	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
+}
+
+// Income is GET /api/v1/income: forward income and its projection. Needs a
+// token.
+func (c *Client) Income(ctx context.Context, params GetIncomeParams) (*Income, error) {
+	resp, err := c.gen.GetIncomeWithResponse(ctx, &params)
 	if err != nil {
 		return nil, c.requestError(err)
 	}

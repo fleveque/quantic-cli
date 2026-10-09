@@ -1,0 +1,4 @@
+SYMBOL  NAME                    SHARES  AVERAGE COST
+VZ      Verizon Communications     220     38.00 USD
+IBE.MC  Iberdrola                  900     11.20 EUR
+O       Realty Income               40     56.00 USD

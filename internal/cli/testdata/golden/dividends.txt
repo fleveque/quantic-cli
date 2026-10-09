@@ -1,0 +1,11 @@
+DATE        SYMBOL  NAME                        GROSS        NET  PORTFOLIO
+2026-10-15  O       Realty Income           18.00 USD  15.30 USD  Pension
+2026-10-15  DGE.L   Diageo plc              58.50 GBP  49.72 GBP  Main
+2026-10-15  O       Realty Income           90.00 USD  76.50 USD  Main
+2026-10-15  KO      Coca-Cola               58.50 USD  49.72 USD  Main
+2026-09-15  O       Realty Income           18.00 USD  15.30 USD  Pension
+2026-09-15  JNJ     Johnson & Johnson       16.20 USD  13.77 USD  Main
+2026-09-15  O       Realty Income           90.00 USD  76.50 USD  Main
+2026-08-15  O       Realty Income           18.00 USD  15.30 USD  Pension
+2026-08-15  VZ      Verizon Communications  99.00 USD  84.15 USD  Pension
+2026-08-15  O       Realty Income           90.00 USD  76.50 USD  Main

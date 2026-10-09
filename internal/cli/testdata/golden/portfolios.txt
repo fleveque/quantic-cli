@@ -1,0 +1,3 @@
+NAME     DEFAULT  SHARED AS
+Main     yes      -
+Pension           -

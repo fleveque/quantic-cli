@@ -1,0 +1,13 @@
+{
+  "schema": "quantic.cli/auth/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "host": "QUANTIC_HOST",
+  "token_source": "QUANTIC_TOKEN",
+  "user": {
+    "id": "fdc49e7c-8df6-4206-8cf8-6ab189d74e01",
+    "name": "Demo Investor",
+    "email": "demo-u4hNjybg@demo.quantic.invalid",
+    "preferred_currency": "EUR"
+  }
+}

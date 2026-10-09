@@ -1,0 +1,9 @@
+Income      1283.53 EUR a year, 1182.80 EUR after withholding
+Yield       4.25%
+Growth      0.0% a year, weighted by income
+In 5 years  1283.53 EUR a year, 1182.80 EUR after withholding (at today's growth)
+
+SYMBOL      INCOME         NET  GROWTH  5Y CAGR  STREAK
+IBE.MC  612.00 EUR  612.00 EUR       -        -  -
+VZ      555.23 EUR  471.95 EUR       -        -  -
+O       116.29 EUR   98.85 EUR       -        -  -

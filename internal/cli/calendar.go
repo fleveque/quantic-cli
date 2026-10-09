@@ -43,7 +43,7 @@ first. Buy before the ex-date to receive the next dividend.`,
 			if days < 1 {
 				return usageError("--days must be at least 1, got %d", days)
 			}
-			cal, err := fetch(cmd, opts, func(ctx context.Context, c *api.Client) (*api.Calendar, error) {
+			cal, err := fetch(cmd, opts, tokenIfAny, func(ctx context.Context, c *api.Client) (*api.Calendar, error) {
 				return c.Calendar(ctx, days)
 			})
 			if err != nil {

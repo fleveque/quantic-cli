@@ -71,7 +71,7 @@ scores. Signed out, the price is the last one Quantic stored, with its time.`,
 			if symbol == "" {
 				return usageError("the symbol is empty")
 			}
-			s, err := fetch(cmd, opts, func(ctx context.Context, c *api.Client) (*api.Stock, error) {
+			s, err := fetch(cmd, opts, tokenIfAny, func(ctx context.Context, c *api.Client) (*api.Stock, error) {
 				return c.Stock(ctx, symbol)
 			})
 			if statusErr, ok := errors.AsType[*api.StatusError](err); ok && statusErr.Status == http.StatusNotFound {
