@@ -12,8 +12,9 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   (S2), OpenAPI 3.0 at `/api/v1/openapi.json`, documented for people at
   https://quantic.finance/developers.
 - Milestone 1 is done (#5): Cobra skeleton, `version`, global flags, exit codes, testscript.
-- Milestone 2 (in review): the generated client (ADR 0002) and `calendar`, `stock`, `search`
-  signed out; lesson 02 and walkthrough 02. Next is milestone 3, when the author says.
+- Milestone 2 is done (#6): the generated client (ADR 0002) and `calendar`, `stock`, `search`
+  signed out. Quantic now names its operations and formats its numbers (quantic#488), so the client
+  is generated from its document with no overlay. Next is milestone 3, when the author says.
 
 ## Conventions
 
