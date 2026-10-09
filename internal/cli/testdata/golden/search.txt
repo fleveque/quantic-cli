@@ -1,0 +1,3 @@
+SYMBOL   NAME                  EXCHANGE  TYPE    TRACKED
+CCC3.DE  COCA-COLA CO., THE R  -         EQUITY  yes
+KO       Coca-Cola             -         EQUITY  yes

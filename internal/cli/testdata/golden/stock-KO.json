@@ -1,0 +1,38 @@
+{
+  "schema": "quantic.cli/stock/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "symbol": "KO",
+  "name": "Coca-Cola",
+  "currency": "USD",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Non-Alcoholic",
+  "instrument_type": "equity",
+  "price": {
+    "amount": "87.005",
+    "currency": "USD",
+    "live": false,
+    "as_of": "2026-10-08T15:00:07.560288Z"
+  },
+  "dividend": {
+    "yield_pct": 2.44,
+    "yield_avg_5y_pct": 2.99,
+    "annual": null,
+    "frequency": "quarterly",
+    "payment_months": [
+      4,
+      7,
+      10,
+      12
+    ],
+    "ex_date": "2026-10-17",
+    "cagr_5y": 0.044617420086995985,
+    "streak_years": 28,
+    "safety": "safe"
+  },
+  "scores": {
+    "rating": 5,
+    "value": 0,
+    "momentum": 9
+  }
+}

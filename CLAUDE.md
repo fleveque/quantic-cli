@@ -11,8 +11,9 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 - Milestone S1 is done in `../quantic` (#482–#485): `/api/v1`, all of design §2.1 but `/upcoming`
   (S2), OpenAPI 3.0 at `/api/v1/openapi.json`, documented for people at
   https://quantic.finance/developers.
-- Milestone 1 (in review): Cobra skeleton, `version`, global flags, exit codes, testscript;
-  lesson 01 and walkthrough 01. Next is milestone 2, when the author says.
+- Milestone 1 is done (#5): Cobra skeleton, `version`, global flags, exit codes, testscript.
+- Milestone 2 (in review): the generated client (ADR 0002) and `calendar`, `stock`, `search`
+  signed out; lesson 02 and walkthrough 02. Next is milestone 3, when the author says.
 
 ## Conventions
 

@@ -1,0 +1,13 @@
+# oapi-codegen's settings; run by `go generate ./internal/api` (doc.go).
+package: api
+output: api.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  overlay:
+    path: overlay.yaml
+  # The generated client is unexported: commands use Client in client.go.
+  client-type-name: genClient
+  user-templates:
+    imports.tmpl: templates/imports.tmpl

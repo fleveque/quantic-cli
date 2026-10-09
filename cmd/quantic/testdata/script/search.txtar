@@ -1,0 +1,16 @@
+# Search: several words are one query.
+
+exec quantic search coca   cola
+! stderr .
+stdout '^KO +Coca-Cola +- +EQUITY +yes$'
+grep '^GET /api/v1/stocks\?q=coca\+cola$' requests.log
+
+exec quantic search coca cola --json
+stdout '"query": "coca cola"'
+stdout '"tracked": true'
+
+-- quantic/api/v1/stocks --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"results": [{"symbol": "KO", "name": "Coca-Cola", "exchange": null, "type": "EQUITY", "tracked": true}]}

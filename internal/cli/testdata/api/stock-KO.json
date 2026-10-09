@@ -1,0 +1,35 @@
+{
+  "name": "Coca-Cola",
+  "symbol": "KO",
+  "currency": "USD",
+  "price": {
+    "currency": "USD",
+    "live": false,
+    "amount": "87.005",
+    "as_of": "2026-10-08T15:00:07.560288Z"
+  },
+  "industry": "Beverages - Non-Alcoholic",
+  "sector": "Consumer Defensive",
+  "dividend": {
+    "ex_dividend_date": "2026-10-17",
+    "payment_months": [
+      4,
+      7,
+      10,
+      12
+    ],
+    "frequency": "quarterly",
+    "safety": "safe",
+    "yield_pct": 2.44,
+    "cagr_5y": 0.044617420086995985,
+    "annual": null,
+    "streak_years": 28,
+    "yield_avg_5y_pct": 2.99
+  },
+  "instrument_type": "equity",
+  "scores": {
+    "value": 0.0,
+    "rating": 5.0,
+    "momentum": 9.0
+  }
+}

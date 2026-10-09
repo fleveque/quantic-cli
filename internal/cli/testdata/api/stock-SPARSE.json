@@ -1,0 +1,21 @@
+{
+  "symbol": "SPARSE",
+  "name": "Written   by    hand",
+  "currency": "EUR",
+  "price": {"amount": "12.30", "currency": "EUR", "live": true, "as_of": null},
+  "sector": null,
+  "industry": null,
+  "instrument_type": null,
+  "dividend": {
+    "annual": {"amount": "0.4812", "currency": "EUR"},
+    "ex_dividend_date": null,
+    "payment_months": [],
+    "frequency": null,
+    "safety": "unknown",
+    "yield_pct": null,
+    "cagr_5y": null,
+    "streak_years": null,
+    "yield_avg_5y_pct": null
+  },
+  "scores": {"value": null, "rating": null, "momentum": null}
+}

@@ -1,0 +1,5 @@
+EX-DATE     SYMBOL  NAME               SECTOR      FREQUENCY
+2026-10-08  MSFT    Microsoft          Technology  quarterly
+2026-10-08  JNJ     Johnson & Johnson  Healthcare  quarterly
+2026-10-09  AAPL    Apple Inc.         Technology  quarterly
+2026-10-10  IBE.MC  Iberdrola          Utilities   semi_annual

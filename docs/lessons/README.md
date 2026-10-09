@@ -11,6 +11,7 @@ that turned out wrong, and the reasoning behind Go's choices where I found it no
 | # | Lesson | Milestone | Read online | Code walkthrough |
 |---|---|---|---|---|
 | [01](01-commands-flags-and-exit-codes.md) | Commands, flags, and exit codes | 1 — the command skeleton | [Commands, flags, and exit codes](https://claude.ai/artifact/XWB84F2VbghTJFbE7GaB7S) | [The command skeleton, line by line](https://claude.ai/artifact/PpMKhtpWX1LLqWtWpuXZDG) |
+| [02](02-a-generated-client-and-the-network.md) | A generated client, and the network | 2 — the generated client | [A generated client, and the network](https://claude.ai/artifact/7kkCVCorLUBF6cjJFduzb5) | [The generated client, line by line](https://claude.ai/artifact/RZgW6D3BNvvxrqLVpW6jCZ) |
 
 Lessons tell the story of a milestone: what surprised me and why. Walkthroughs go through the code
 itself in reading order, the way a tech lead would with a new teammate. Server milestones (S1, S2)

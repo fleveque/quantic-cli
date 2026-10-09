@@ -1,0 +1,34 @@
+{
+  "from": "2026-10-08",
+  "days": 7,
+  "stocks": [
+    {
+      "name": "Microsoft",
+      "symbol": "MSFT",
+      "sector": "Technology",
+      "ex_dividend_date": "2026-10-08",
+      "payment_frequency": "quarterly"
+    },
+    {
+      "name": "Johnson & Johnson",
+      "symbol": "JNJ",
+      "sector": "Healthcare",
+      "ex_dividend_date": "2026-10-08",
+      "payment_frequency": "quarterly"
+    },
+    {
+      "name": "Apple Inc.",
+      "symbol": "AAPL",
+      "sector": "Technology",
+      "ex_dividend_date": "2026-10-09",
+      "payment_frequency": "quarterly"
+    },
+    {
+      "name": "Iberdrola",
+      "symbol": "IBE.MC",
+      "sector": "Utilities",
+      "ex_dividend_date": "2026-10-10",
+      "payment_frequency": "semi_annual"
+    }
+  ]
+}
