@@ -31,14 +31,14 @@ func newPortfoliosCmd(opts *Options) *cobra.Command {
 slug, in any case.`,
 		Args: usageArgs(cobra.NoArgs),
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			list, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.PortfolioList, error) {
+			list, at, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.PortfolioList, error) {
 				return c.Portfolios(ctx)
 			})
 			if err != nil {
 				return err
 			}
 
-			out := portfoliosOutput{envelope: newEnvelope(portfoliosSchema), Items: make([]portfolioItem, 0, len(list.Portfolios))}
+			out := portfoliosOutput{envelope: newEnvelope(portfoliosSchema, at), Items: make([]portfolioItem, 0, len(list.Portfolios))}
 			for _, p := range list.Portfolios {
 				out.Items = append(out.Items, portfolioItem{Name: p.Name, Default: p.Default, Slug: p.Slug})
 			}

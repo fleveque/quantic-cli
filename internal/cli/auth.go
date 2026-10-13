@@ -12,6 +12,7 @@ import (
 
 	"github.com/fleveque/quantic-cli/internal/api"
 	"github.com/fleveque/quantic-cli/internal/auth"
+	"github.com/fleveque/quantic-cli/internal/cache"
 	"github.com/fleveque/quantic-cli/internal/render"
 )
 
@@ -51,10 +52,11 @@ With --with-token, the token is read from standard input instead of asked for:
 				return err
 			}
 			s.token = auth.Token{Secret: secret}
+			s.noCache = true
 
 			// Checked before it's stored: a typo is found now, not by the next
 			// command, and a token that works is the only kind kept.
-			me, err := callQuantic(cmd, opts, s, func(ctx context.Context, c *api.Client) (*api.Me, error) {
+			me, _, err := callQuantic(cmd, opts, s, func(ctx context.Context, c *api.Client) (*api.Me, error) {
 				return c.Me(ctx)
 			})
 			if ExitCode(err) == ExitNotSignedIn {
@@ -127,8 +129,8 @@ func newLogoutCmd(opts *Options) *cobra.Command {
 	return &cobra.Command{
 		Use:   "logout",
 		Short: "Forget the stored token",
-		Long: `Removes the token stored for this Quantic host. The token itself keeps working
-until you revoke it in Quantic's settings.`,
+		Long: `Removes the token stored for this Quantic host, and empties the cache. The token
+itself keeps working until you revoke it in Quantic's settings.`,
 		Args: usageArgs(cobra.NoArgs),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			// Not newSession: a token that can't be loaded (in a file others
@@ -141,6 +143,11 @@ until you revoke it in Quantic's settings.`,
 			removed, err := opts.store().Delete(s.host)
 			if err != nil {
 				return err
+			}
+			// The cache holds what the token could read (design §7). Entries are
+			// per token, but a signed-out machine shouldn't keep a portfolio.
+			if err := (cache.Store{Dir: opts.cacheDir()}).Clear(); err != nil {
+				return fmt.Errorf("signed out, but the cache couldn't be cleared: %w", err)
 			}
 
 			w, errOut := cmd.OutOrStdout(), cmd.ErrOrStderr()
@@ -187,7 +194,7 @@ Quantic rejects it, so a script can check before it starts.`,
 			if err != nil {
 				return err
 			}
-			me, err := callQuantic(cmd, opts, s, func(ctx context.Context, c *api.Client) (*api.Me, error) {
+			me, at, err := callQuantic(cmd, opts, s, func(ctx context.Context, c *api.Client) (*api.Me, error) {
 				return c.Me(ctx)
 			})
 			if err != nil {
@@ -195,7 +202,7 @@ Quantic rejects it, so a script can check before it starts.`,
 			}
 
 			out := authStatusOutput{
-				envelope:    newEnvelope(authStatusSchema),
+				envelope:    newEnvelope(authStatusSchema, at),
 				Host:        s.host,
 				TokenSource: s.token.Source,
 				User: authUser{

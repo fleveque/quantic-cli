@@ -15,6 +15,7 @@ import (
 
 	"github.com/fleveque/quantic-cli/internal/api"
 	"github.com/fleveque/quantic-cli/internal/auth"
+	"github.com/fleveque/quantic-cli/internal/cache"
 )
 
 // defaultURL is Quantic in production. QUANTIC_URL replaces it, e.g. with
@@ -33,9 +34,10 @@ const (
 
 // session is one Quantic and the token for it.
 type session struct {
-	base  string     // QUANTIC_URL, or defaultURL
-	host  string     // its host, which the token is kept under
-	token auth.Token // zero when signed out
+	base    string     // QUANTIC_URL, or defaultURL
+	host    string     // its host, which the token is kept under
+	token   auth.Token // zero when signed out
+	noCache bool       // always ask Quantic: `auth login` checking a new token
 }
 
 // newSession finds Quantic and, if there is one, the token for it.
@@ -86,23 +88,36 @@ func (o *Options) store() *auth.Store {
 	return s
 }
 
+// fetched says where an answer came from: when Quantic gave it, and whether
+// it is a cached copy used because Quantic couldn't be reached.
+type fetched struct {
+	At    time.Time
+	Stale bool
+}
+
 // fetch makes one call to Quantic for cmd: it finds the session, gives the
-// call --timeout to finish, retries included, and turns its error into the
-// right exit code (design §6).
-func fetch[T any](cmd *cobra.Command, opts *Options, n need, call func(context.Context, *api.Client) (*T, error)) (*T, error) {
+// call --timeout to finish, retries included, answers from the cache when it
+// can, and turns an error into the right exit code (design §6, §7).
+func fetch[T any](cmd *cobra.Command, opts *Options, n need, call func(context.Context, *api.Client) (*T, error)) (*T, fetched, error) {
 	s, err := opts.newSession(n)
 	if err != nil {
-		return nil, err
+		return nil, fetched{}, err
 	}
 	return callQuantic(cmd, opts, s, call)
 }
 
 // callQuantic is fetch for a session already found: `auth login` makes its
 // own, with the token it is about to store.
-func callQuantic[T any](cmd *cobra.Command, opts *Options, s session, call func(context.Context, *api.Client) (*T, error)) (*T, error) {
-	client, err := api.New(api.Config{BaseURL: s.base, UserAgent: opts.userAgent, Token: s.token.Secret})
+func callQuantic[T any](cmd *cobra.Command, opts *Options, s session, call func(context.Context, *api.Client) (*T, error)) (*T, fetched, error) {
+	cfg := api.Config{BaseURL: s.base, UserAgent: opts.userAgent, Token: s.token.Secret}
+	var cached *cache.Transport
+	if dir := opts.cacheDir(); dir != "" && !opts.NoCache && !s.noCache {
+		cached = &cache.Transport{Store: cache.Store{Dir: dir}, MaxAge: freshFor, Now: opts.now}
+		cfg.Transport = cached
+	}
+	client, err := api.New(cfg)
 	if err != nil {
-		return nil, usageError("QUANTIC_URL: %v", err)
+		return nil, fetched{}, usageError("QUANTIC_URL: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(cmd.Context(), opts.Timeout)
@@ -110,9 +125,67 @@ func callQuantic[T any](cmd *cobra.Command, opts *Options, s session, call func(
 
 	v, err := call(ctx, client)
 	if err != nil {
-		return nil, exitErrorFor(err, opts.Timeout, s)
+		return nil, fetched{}, exitErrorFor(err, opts.Timeout, s)
 	}
-	return v, nil
+	if cached == nil {
+		return v, fetched{At: opts.now()}, nil
+	}
+	last := cached.Last()
+	if last.Stale {
+		fmt.Fprintf(cmd.ErrOrStderr(), "quantic: can't reach %s; this is what it said at %s UTC, %s\n",
+			s.host, last.FetchedAt.UTC().Format("2006-01-02 15:04"), ago(opts.now().Sub(last.FetchedAt)))
+	}
+	return v, fetched{At: last.FetchedAt, Stale: last.Stale}, nil
+}
+
+// ago says how long ago, as people do: "40 minutes ago", not "40m0s".
+func ago(d time.Duration) string {
+	switch {
+	case d < time.Minute:
+		return "moments ago"
+	case d < 2*time.Minute:
+		return "a minute ago"
+	case d < time.Hour:
+		return fmt.Sprintf("%d minutes ago", int(d/time.Minute))
+	case d < 2*time.Hour:
+		return "an hour ago"
+	case d < 48*time.Hour:
+		return fmt.Sprintf("%d hours ago", int(d/time.Hour))
+	}
+	return fmt.Sprintf("%d days ago", int(d/(24*time.Hour)))
+}
+
+// freshFor is how long each answer is used without asking Quantic again
+// (design §7). Revalidating an older one costs a 304 with no body when
+// nothing changed. /me is always asked: `auth status` is how a script checks
+// a token still works.
+func freshFor(req *http.Request) time.Duration {
+	p := req.URL.Path
+	if i := strings.Index(p, "/api/v1/"); i >= 0 {
+		p = p[i:] // QUANTIC_URL may have a path of its own
+	}
+	switch {
+	case p == "/api/v1/calendar":
+		return 6 * time.Hour
+	case p == "/api/v1/holdings", p == "/api/v1/income", p == "/api/v1/dividends":
+		return 15 * time.Minute
+	case strings.HasPrefix(p, "/api/v1/stocks/"):
+		return 15 * time.Minute // prices move
+	case p == "/api/v1/stocks", p == "/api/v1/portfolios":
+		return time.Hour
+	}
+	return 0
+}
+
+// cacheDir is where answers are kept: os.UserCacheDir ($XDG_CACHE_HOME, or
+// ~/.cache, on Linux) plus "quantic". Empty when there's no such place, and
+// then nothing is cached.
+func (o *Options) cacheDir() string {
+	dir, err := os.UserCacheDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(dir, "quantic")
 }
 
 // exitErrorFor gives an error from the api package its exit code, and a
@@ -158,17 +231,16 @@ func rejected(s session) error {
 }
 
 // envelope starts every data command's --json output (design §5): which
-// shape it is, when it was fetched, and whether it came from a stale cache.
-// Nothing is cached yet (milestone 4), so stale is always false for now; it
-// is in the shape from the start so no program has to check for it later.
+// shape it is, when Quantic gave the answer, and whether it is a cached copy
+// used because Quantic couldn't be reached (design §7).
 type envelope struct {
 	Schema    string    `json:"schema"`
 	FetchedAt time.Time `json:"fetched_at"`
 	Stale     bool      `json:"stale"`
 }
 
-func newEnvelope(schema string) envelope {
-	return envelope{Schema: schema, FetchedAt: time.Now().UTC().Truncate(time.Second)}
+func newEnvelope(schema string, f fetched) envelope {
+	return envelope{Schema: schema, FetchedAt: f.At.UTC().Truncate(time.Second), Stale: f.Stale}
 }
 
 // money is an amount and its currency, as Quantic sends it. The amount stays

@@ -15,8 +15,10 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 - Milestone 2 is done (#6): the generated client (ADR 0002) and `calendar`, `stock`, `search`
   signed out. Quantic now names its operations and formats its numbers (quantic#488), so the client
   is generated from its document with no overlay.
-- Milestone 3 (in review): `auth login`/`logout`/`status` with the keyring (ADR 0003), and
-  `portfolios`, `holdings`, `dividends`, `income`; lesson 03 and walkthrough 03. Next is milestone 4,
+- Milestone 3 is done (#8): `auth login`/`logout`/`status` with the keyring (ADR 0003), and
+  `portfolios`, `holdings`, `dividends`, `income`.
+- Milestone 4 (in review): the cache (ADR 0004): freshness, ETags, stale answers offline, a lock
+  per entry; lesson 04 and walkthrough 04. Next is S2 (`/upcoming` in Quantic) and milestone 5,
   when the author says.
 
 ## Conventions

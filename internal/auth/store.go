@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path/filepath"
+
+	"github.com/fleveque/quantic-cli/internal/privfile"
 )
 
 // Keyring is the part of a system keyring the CLI uses: one secret per
@@ -201,32 +202,14 @@ func (s *Store) removeFromFile(host string) error {
 	return s.writeFile(tokens)
 }
 
-// writeFile replaces the file in one step: written to a temporary file next
-// to it, then renamed over it. A crash leaves the old file or the new one,
-// never half of either. os.CreateTemp makes the file 0600 from the start,
-// so the token is never readable by others, not even for a moment.
+// writeFile replaces the file, private and in one step (privfile.Write).
 func (s *Store) writeFile(tokens map[string]string) error {
 	if s.File == "" {
 		return errors.New("there's no keyring, and nowhere for a token file: neither $XDG_CONFIG_HOME nor $HOME is set")
 	}
-	dir := filepath.Dir(s.File)
-	if err := os.MkdirAll(dir, 0o700); err != nil {
-		return err
-	}
-	tmp, err := os.CreateTemp(dir, ".tokens-*.json")
+	b, err := json.MarshalIndent(tokens, "", "  ")
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmp.Name()) // after a successful rename, there's nothing to remove
-
-	enc := json.NewEncoder(tmp)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(tokens); err != nil {
-		tmp.Close()
-		return err
-	}
-	if err := tmp.Close(); err != nil {
-		return err
-	}
-	return os.Rename(tmp.Name(), s.File)
+	return privfile.Write(s.File, append(b, '\n'))
 }
