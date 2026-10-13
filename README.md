@@ -3,9 +3,10 @@
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal, and in scripts and status bars through `--json`.
 
-> **Status: milestone 3 of 9.** Sign in with a personal API token, then read your own
+> **Status: milestone 4 of 9.** Sign in with a personal API token, then read your own
 > `portfolios`, `holdings`, `dividends` and `income`. The public commands (`calendar`, `stock`,
-> `search`) work signed out too. Caching and offline use come in milestone 4. The API it reads is
+> `search`) work signed out too. Answers are cached, and when Quantic can't be reached the last
+> one is shown, marked stale. `upcoming` and `status` come in milestone 5. The API it reads is
 > documented at [quantic.finance/developers](https://quantic.finance/developers). Start with the
 > [design](docs/design.md).
 
@@ -91,13 +92,31 @@ Every `--json` output names its shape and version (`"schema": "quantic.cli/incom
 minute per IP address; a rate-limited call is retried, then exits 5. Signed in, every command sends
 the token, public ones included.
 
+**The cache.** Answers are kept in `$XDG_CACHE_HOME/quantic` (`~/.cache/quantic`), readable only by
+you, and used without asking Quantic while they're fresh: the calendar for 6 hours, holdings,
+dividends, income and a stock for 15 minutes, portfolios and searches for an hour. After that, the
+CLI asks again with the answer's `ETag`, and an unchanged answer costs a `304` with no body.
+`auth status` always asks. When Quantic can't be reached, the last answer is used, whatever its age:
+
+```
+$ quantic stock KO          # with the network down
+quantic: can't reach quantic.finance; this is what it said at 2026-10-13 12:00 UTC, an hour ago
+KO  Coca-Cola
+...
+```
+
+with `"stale": true` and the original `fetched_at` in `--json`, and exit 0, so a status bar keeps
+showing the last known state. `--no-cache` asks Quantic and leaves the cache alone;
+`quantic cache clear` and `quantic auth logout` empty it. Two commands asking for the same thing at
+once (the bar, and you in a terminal) make one request: the second waits for the first's answer.
+
 There are no releases yet (milestone 7), so the version is a Go pseudo-version naming the commit,
 such as `v0.0.0-20261008113214-5820da20436c`.
 
 **Global flags:** `--json` (machine-readable output, a versioned contract), `--timeout` (default
 `10s`, for the whole call, retries included), `--portfolio <name>` (for `holdings`, `dividends` and
-`income`: one portfolio, by name or slug, in any case) and `--no-cache` (accepted now, used from
-milestone 4).
+`income`: one portfolio, by name or slug, in any case) and `--no-cache` (ask Quantic; don't read
+or write the cache).
 
 **Environment:** `QUANTIC_URL` points the CLI at another Quantic, such as `http://localhost:4000`
 for a local server (default `https://quantic.finance`); it has its own stored token.
@@ -107,7 +126,7 @@ for a local server (default `https://quantic.finance`); it has its own stored to
 
 | Code | Meaning |
 |---|---|
-| 0 | OK |
+| 0 | OK, possibly from the cache (`"stale": true` says Quantic couldn't be reached) |
 | 1 | Failed, e.g. a symbol Quantic doesn't track |
 | 2 | Wrong usage: unknown command or flag, bad value, extra arguments, a portfolio you don't have |
 | 3 | Quantic unreachable, and nothing cached |

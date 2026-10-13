@@ -1,7 +1,8 @@
 # quantic-cli — design
 
 **Status:** draft, 2026-10-07. The server side of §2.1 is built (milestone S1, 2026-10-08). The CLI
-has its skeleton, the public commands, and signing in with your own portfolio (milestones 1–3).
+has its skeleton, the public commands, signing in with your own portfolio, and the cache
+(milestones 1–4).
 
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal and in scripts, plus an Omarchy bar widget built on it. It is also where I
@@ -214,6 +215,13 @@ A script or the widget can tell "log in again" (4) from "offline" (3) without pa
   `fetched_at`, and exit 0. The bar keeps showing the last known state, marked stale.
 - **One fetch at a time:** a lock file per cache entry, so the widget and a terminal command don't
   fetch the same thing at once (the `flock` pattern quantic-agent's store uses).
+- **As built (milestone 4, [ADR 0004](decisions/0004-the-cache-is-a-transport.md)):** the cache is an
+  `http.RoundTripper` under the API client, keyed by a hash of the method, the URL and the
+  `Authorization` header (each token its own entries; no token in any file). Portfolios and
+  searches are fresh for 1h and a stock for 15 minutes; `/me` is always revalidated. "Can't be
+  reached" is no connection, a timeout, or a `502`/`503`/`504`; any other answer passes through
+  and isn't stored. `auth login` never uses the cache. A cache that can't be written is no cache,
+  never a failure. The lock is polled, not blocking, so waiting for it ends at `--timeout`.
 - **Rate limits:** anonymous calls share Quantic's 60/min per IP. A `429` is retried with backoff
   and jitter, as quantic-agent's MCP client does, then exit 5. Authenticated calls aren't
   rate limited today, but the widget still refreshes no more than every few minutes.
@@ -304,6 +312,7 @@ internal/cli/           Cobra commands, flags, exit codes
 internal/api/           client generated from Quantic's OpenAPI document, plus a thin wrapper
 internal/auth/          keyring, QUANTIC_TOKEN, the file fallback; authtest/ has keyrings for tests
 internal/cache/         files, freshness, ETags, per-entry locks
+internal/privfile/      files only their owner can read, written in one step
 internal/render/        tables (text/tabwriter) and JSON output types
 internal/status/        the concurrent composition behind `quantic status`
 ```
@@ -344,7 +353,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | 1 | Cobra skeleton: `version`, flags, `--json`, exit codes; `testscript`. **Done** (#5) | Cobra, `io.Writer` design, testscript |
 | 2 | Generated client; `calendar`, `stock`, `search` signed out. **Done** (#6, [ADR 0002](decisions/0002-generated-client-from-a-checked-in-spec.md)) | OpenAPI codegen, `net/http`, `context` |
 | 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income`. **Done** (#8, [ADR 0003](decisions/0003-where-the-token-lives.md)) | interfaces for secrets, OS integration |
-| 4 | Cache: freshness, ETags, offline, locks | files, `encoding/json`, `flock`, time |
+| 4 | Cache: freshness, ETags, offline, locks. **Done** (#9, [ADR 0004](decisions/0004-the-cache-is-a-transport.md)) | files, `encoding/json`, `flock`, time |
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts | — |
 | 5 | `upcoming` and `status`, concurrently | `errgroup`, partial failure |
 | 6 | The Omarchy widget, in its own repo | (QML, not Go; consuming your own JSON contract) |
