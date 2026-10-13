@@ -37,6 +37,20 @@ var private = []string{"/api/v1/me", "/api/v1/portfolios", "/api/v1/holdings", "
 // a test to check.
 func fakeQuantic(t *testing.T) *[]string {
 	t.Helper()
+	_, requests := startFakeQuantic(t)
+	return requests
+}
+
+// fakeQuanticServer is fakeQuantic for a test that closes it, to see what
+// happens when Quantic can't be reached.
+func fakeQuanticServer(t *testing.T) *httptest.Server {
+	t.Helper()
+	srv, _ := startFakeQuantic(t)
+	return srv
+}
+
+func startFakeQuantic(t *testing.T) (*httptest.Server, *[]string) {
+	t.Helper()
 	var mu sync.Mutex
 	var requests []string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +96,7 @@ func fakeQuantic(t *testing.T) *[]string {
 	}))
 	t.Cleanup(srv.Close)
 	t.Setenv("QUANTIC_URL", srv.URL)
-	return &requests
+	return srv, &requests
 }
 
 // fetchedAt is the one part of the output that changes on every run.

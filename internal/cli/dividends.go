@@ -65,7 +65,7 @@ them with --symbol, --from and --to (dates as 2026-01-31), and --portfolio.`,
 				return usageError("--to (%s) is before --from (%s)", to, from)
 			}
 
-			list, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.DividendList, error) {
+			list, at, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.DividendList, error) {
 				return c.Dividends(ctx, params)
 			})
 			if err != nil {
@@ -73,7 +73,7 @@ them with --symbol, --from and --to (dates as 2026-01-31), and --portfolio.`,
 			}
 
 			out := dividendsOutput{
-				envelope:  newEnvelope(dividendsSchema),
+				envelope:  newEnvelope(dividendsSchema, at),
 				Symbol:    params.Symbol,
 				From:      optional(from),
 				To:        optional(to),

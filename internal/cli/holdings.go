@@ -38,7 +38,7 @@ func newHoldingsCmd(opts *Options) *cobra.Command {
 the average cost of each, in the currency it trades in.`,
 		Args: usageArgs(cobra.NoArgs),
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			list, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.HoldingList, error) {
+			list, at, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.HoldingList, error) {
 				return c.Holdings(ctx, api.ListHoldingsParams{Portfolio: optional(opts.Portfolio)})
 			})
 			if err != nil {
@@ -46,7 +46,7 @@ the average cost of each, in the currency it trades in.`,
 			}
 
 			out := holdingsOutput{
-				envelope:  newEnvelope(holdingsSchema),
+				envelope:  newEnvelope(holdingsSchema, at),
 				Portfolio: optional(opts.Portfolio),
 				Items:     make([]holdingItem, 0, len(list.Holdings)),
 			}

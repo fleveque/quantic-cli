@@ -76,13 +76,13 @@ from; and a projection --years ahead at their dividend growth.`,
 			if years < 1 {
 				return usageError("--years must be at least 1, got %d", years)
 			}
-			inc, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.Income, error) {
+			inc, at, err := fetch(cmd, opts, tokenNeeded, func(ctx context.Context, c *api.Client) (*api.Income, error) {
 				return c.Income(ctx, api.GetIncomeParams{Years: &years, Drip: &drip, Portfolio: optional(opts.Portfolio)})
 			})
 			if err != nil {
 				return err
 			}
-			out := newIncomeOutput(inc, optional(opts.Portfolio))
+			out := newIncomeOutput(inc, optional(opts.Portfolio), at)
 
 			w := cmd.OutOrStdout()
 			if opts.JSON {
@@ -96,9 +96,9 @@ from; and a projection --years ahead at their dividend growth.`,
 	return cmd
 }
 
-func newIncomeOutput(inc *api.Income, portfolio *string) incomeOutput {
+func newIncomeOutput(inc *api.Income, portfolio *string, at fetched) incomeOutput {
 	out := incomeOutput{
-		envelope:        newEnvelope(incomeSchema),
+		envelope:        newEnvelope(incomeSchema, at),
 		Portfolio:       portfolio,
 		AnnualIncome:    money(inc.AnnualIncome),
 		NetAnnualIncome: money(inc.NetAnnualIncome),

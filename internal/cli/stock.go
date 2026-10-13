@@ -71,7 +71,7 @@ scores. Signed out, the price is the last one Quantic stored, with its time.`,
 			if symbol == "" {
 				return usageError("the symbol is empty")
 			}
-			s, err := fetch(cmd, opts, tokenIfAny, func(ctx context.Context, c *api.Client) (*api.Stock, error) {
+			s, at, err := fetch(cmd, opts, tokenIfAny, func(ctx context.Context, c *api.Client) (*api.Stock, error) {
 				return c.Stock(ctx, symbol)
 			})
 			if statusErr, ok := errors.AsType[*api.StatusError](err); ok && statusErr.Status == http.StatusNotFound {
@@ -83,7 +83,7 @@ scores. Signed out, the price is the last one Quantic stored, with its time.`,
 				return err
 			}
 
-			out := newStockOutput(s)
+			out := newStockOutput(s, at)
 			w := cmd.OutOrStdout()
 			if opts.JSON {
 				return render.JSON(w, out)
@@ -93,9 +93,9 @@ scores. Signed out, the price is the last one Quantic stored, with its time.`,
 	}
 }
 
-func newStockOutput(s *api.Stock) stockOutput {
+func newStockOutput(s *api.Stock, at fetched) stockOutput {
 	out := stockOutput{
-		envelope:       newEnvelope(stockSchema),
+		envelope:       newEnvelope(stockSchema, at),
 		Symbol:         s.Symbol,
 		Name:           s.Name,
 		Currency:       s.Currency,

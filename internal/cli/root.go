@@ -26,8 +26,16 @@ type Options struct {
 	NoCache   bool
 	Timeout   time.Duration
 
-	userAgent string       // "quantic-cli/<version>", sent with every request
-	keyring   auth.Keyring // where `auth login` keeps the token
+	userAgent string           // "quantic-cli/<version>", sent with every request
+	keyring   auth.Keyring     // where `auth login` keeps the token
+	clock     func() time.Time // nil: time.Now
+}
+
+func (o *Options) now() time.Time {
+	if o.clock != nil {
+		return o.clock()
+	}
+	return time.Now()
 }
 
 // defaultTimeout bounds one call to Quantic. Ten seconds is long for an API
@@ -38,14 +46,25 @@ const defaultTimeout = 10 * time.Second
 // Run executes the command line in args and returns the process exit code.
 // It never calls os.Exit, so tests can call it as often as they like.
 func Run(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build) int {
-	return RunWith(args, stdin, stdout, stderr, build, auth.SystemKeyring{})
+	return RunWith(args, stdin, stdout, stderr, build, Deps{Keyring: auth.SystemKeyring{}})
 }
 
-// RunWith is Run with another keyring. The binary always uses the system's;
-// tests use one of their own, so they never touch the keyring of the
-// machine they run on.
-func RunWith(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build, keyring auth.Keyring) int {
-	root := newRootCmd(build, keyring)
+// Deps is what the CLI takes from the machine it runs on, other than the
+// streams and the environment: tests replace each.
+type Deps struct {
+	// Keyring is where `auth login` keeps the token. The binary always uses
+	// the system's; tests use their own, so they never touch the keyring of
+	// the machine they run on (ADR 0003).
+	Keyring auth.Keyring
+
+	// Now is the clock that decides whether a cached answer is fresh; nil
+	// means time.Now. Scripts move it forward to make the cache go stale.
+	Now func() time.Time
+}
+
+// RunWith is Run with other Deps.
+func RunWith(args []string, stdin io.Reader, stdout, stderr io.Writer, build Build, deps Deps) int {
+	root := newRootCmd(build, deps)
 	root.SetArgs(args)
 	root.SetIn(stdin)
 	root.SetOut(stdout)
@@ -62,9 +81,9 @@ func RunWith(args []string, stdin io.Reader, stdout, stderr io.Writer, build Bui
 	return code
 }
 
-func newRootCmd(build Build, keyring auth.Keyring) *cobra.Command {
+func newRootCmd(build Build, deps Deps) *cobra.Command {
 	info, _ := debug.ReadBuildInfo()
-	opts := &Options{userAgent: "quantic-cli/" + build.withFallback(info).Version, keyring: keyring}
+	opts := &Options{userAgent: "quantic-cli/" + build.withFallback(info).Version, keyring: deps.Keyring, clock: deps.Now}
 
 	root := &cobra.Command{
 		Use:   "quantic",
@@ -135,6 +154,7 @@ Environment:
 		newHoldingsCmd(opts),
 		newDividendsCmd(opts),
 		newIncomeCmd(opts),
+		newCacheCmd(opts),
 		newCalendarCmd(opts),
 		newStockCmd(opts),
 		newSearchCmd(opts),

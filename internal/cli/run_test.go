@@ -15,9 +15,9 @@ import (
 	"github.com/fleveque/quantic-cli/internal/cli"
 )
 
-// TestMain keeps the tests away from the sign-in of whoever runs them: no
-// QUANTIC_TOKEN or QUANTIC_URL from their shell, and a config directory of
-// the tests' own, so no tokens.json is read or written in theirs.
+// TestMain keeps the tests away from the sign-in and cache of whoever runs
+// them: no QUANTIC_TOKEN or QUANTIC_URL from their shell, and config and
+// cache directories of the tests' own.
 func TestMain(m *testing.M) {
 	os.Unsetenv("QUANTIC_TOKEN")
 	os.Unsetenv("QUANTIC_URL")
@@ -26,6 +26,8 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	os.Setenv("XDG_CONFIG_HOME", dir)
+	sharedCache = dir + "/cache"
+	os.Setenv("XDG_CACHE_HOME", sharedCache)
 	code := m.Run()
 	os.RemoveAll(dir)
 	os.Exit(code)
@@ -40,11 +42,19 @@ func run(t *testing.T, args ...string) (code int, stdout, stderr string) {
 	return runWith(t, &authtest.Keyring{}, "", args...)
 }
 
-// runWith is run with a keyring and what standard input holds.
+// sharedCache is XDG_CACHE_HOME until a test sets its own.
+var sharedCache string
+
+// runWith is run with a keyring and what standard input holds. Each test
+// gets a cache of its own, kept across its runs: a fake Quantic's port can
+// come round again in a later test, and its answers must not.
 func runWith(t *testing.T, keyring auth.Keyring, stdin string, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
+	if os.Getenv("XDG_CACHE_HOME") == sharedCache {
+		t.Setenv("XDG_CACHE_HOME", t.TempDir())
+	}
 	var out, errOut bytes.Buffer
-	code = cli.RunWith(args, strings.NewReader(stdin), &out, &errOut, release, keyring)
+	code = cli.RunWith(args, strings.NewReader(stdin), &out, &errOut, release, cli.Deps{Keyring: keyring})
 	return code, out.String(), errOut.String()
 }
 

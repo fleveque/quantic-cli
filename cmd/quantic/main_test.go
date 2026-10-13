@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/rogpeppe/go-internal/testscript"
 
@@ -42,7 +43,18 @@ func mainForTests() {
 		keyring.Err = authtest.ErrNoSecretService
 	}
 	build := cli.Build{Version: version, Commit: commit, Date: date}
-	os.Exit(cli.RunWith(os.Args[1:], os.Stdin, os.Stdout, os.Stderr, build, keyring))
+	// TEST_NOW, as 2026-10-13T09:00:00Z, is the clock: a script moves it to
+	// make the cache go stale.
+	var testNow func() time.Time
+	if s := os.Getenv("TEST_NOW"); s != "" {
+		at, err := time.Parse(time.RFC3339, s)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "TEST_NOW: %v\n", err)
+			os.Exit(1)
+		}
+		testNow = func() time.Time { return at }
+	}
+	os.Exit(cli.RunWith(os.Args[1:], os.Stdin, os.Stdout, os.Stderr, build, cli.Deps{Keyring: keyring, Now: testNow}))
 }
 
 // TestScripts runs every testdata/script/*.txtar: the commands, their exit
@@ -62,7 +74,9 @@ func TestScripts(t *testing.T) {
 // from the script's own files: a request for /api/v1/stocks/KO gets the raw
 // HTTP response in quantic/api/v1/stocks/KO, status line and headers
 // included, so a script says exactly what the server sends. A path with no
-// file is a 404. A file named with the query as well
+// file is a 404; a file with an ETag answers a matching If-None-Match with
+// a 304. While quantic/down exists, every connection is dropped unanswered.
+// A file named with the query as well
 // (quantic/api/v1/holdings?portfolio=nope) wins over the path alone. When
 // the script has a quantic/tokens file, a request with any other bearer token
 // gets Quantic's 401. Every request is appended to requests.log as "GET <url>",
@@ -77,8 +91,21 @@ func fakeQuantic(env *testscript.Env) error {
 		if a := r.Header.Get("Authorization"); a != "" {
 			line += " " + a
 		}
+		if inm := r.Header.Get("If-None-Match"); inm != "" {
+			line += " If-None-Match: " + inm
+		}
 		if err := appendLine(filepath.Join(env.WorkDir, "requests.log"), line); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Down: the connection is dropped with no answer, as when Quantic
+		// can't be reached.
+		if _, err := os.Stat(filepath.Join(env.WorkDir, "quantic", "down")); err == nil {
+			conn, _, err := http.NewResponseController(w).Hijack()
+			if err == nil {
+				conn.Close()
+			}
 			return
 		}
 
@@ -115,6 +142,11 @@ func fakeQuantic(env *testscript.Env) error {
 		for k, v := range resp.Header {
 			w.Header()[k] = v
 		}
+		// As Quantic does: an If-None-Match that matches the ETag is a 304.
+		if etag := resp.Header.Get("ETag"); etag != "" && r.Header.Get("If-None-Match") == etag {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
 		w.WriteHeader(resp.StatusCode)
 		io.Copy(w, resp.Body)
 	}))
@@ -123,6 +155,7 @@ func fakeQuantic(env *testscript.Env) error {
 	// os.UserConfigDir reads it first; without it, $HOME, which testscript
 	// sets to a directory that doesn't exist.
 	env.Setenv("XDG_CONFIG_HOME", filepath.Join(env.WorkDir, "config"))
+	env.Setenv("XDG_CACHE_HOME", filepath.Join(env.WorkDir, "cache"))
 	return nil
 }
 

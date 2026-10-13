@@ -1,0 +1,67 @@
+# The cache (design §7): a fresh answer is used without asking Quantic, an
+# older one is revalidated with its ETag, and when Quantic can't be reached
+# the last answer is used, marked stale. TEST_NOW is the clock.
+
+env QUANTIC_TOKEN=qtc_script
+env TEST_NOW=2026-10-13T09:00:00Z
+exec quantic holdings --json
+stdout '"fetched_at": "2026-10-13T09:00:00Z",\n  "stale": false'
+grep -count=1 '^GET /api/v1/holdings ' requests.log
+
+# Ten minutes later, holdings (fresh for 15) come from the cache.
+env TEST_NOW=2026-10-13T09:10:00Z
+exec quantic holdings --json
+stdout '"fetched_at": "2026-10-13T09:00:00Z",\n  "stale": false'
+grep -count=1 '^GET /api/v1/holdings ' requests.log
+
+# Twenty: asked again, with the ETag; the 304 makes it fetched now.
+env TEST_NOW=2026-10-13T09:20:00Z
+exec quantic holdings --json
+stdout '"fetched_at": "2026-10-13T09:20:00Z",\n  "stale": false'
+grep '^GET /api/v1/holdings Bearer qtc_script If-None-Match: W/"h1"$' requests.log
+
+# Quantic can't be reached: the last answer, stale, exit 0, and a note.
+mkdir quantic/down
+env TEST_NOW=2026-10-13T10:00:00Z
+exec quantic holdings --json
+stdout '"fetched_at": "2026-10-13T09:20:00Z",\n  "stale": true'
+stdout '"symbol": "VZ"'
+stderr '^quantic: can''t reach 127\.0\.0\.1:\d+; this is what it said at 2026-10-13 09:20 UTC, 40 minutes ago$'
+exec quantic holdings
+stdout '^VZ +Verizon'
+
+# With nothing cached, offline is still exit 3.
+exits 3 quantic dividends
+! stdout .
+
+# --no-cache asks Quantic, offline or not.
+exits 3 quantic holdings --no-cache
+
+# Back online.
+rm quantic/down
+exec quantic holdings --no-cache
+! stderr .
+
+# The cache is private and holds no token.
+mode cache/quantic 0700
+! exec grep -r qtc_script cache
+
+exec quantic cache clear
+stdout '^Cleared .*cache/quantic\.$'
+! exists cache/quantic
+
+# auth logout empties it too.
+exec quantic holdings
+exists cache/quantic
+env QUANTIC_TOKEN=
+exec quantic auth logout
+! exists cache/quantic
+
+-- quantic/api/v1/holdings --
+HTTP/1.1 200 OK
+Content-Type: application/json
+ETag: W/"h1"
+
+{"holdings": [
+  {"symbol": "VZ", "name": "Verizon Communications", "shares": "220", "sector": "Communication Services",
+   "instrument_type": "equity", "average_cost": {"amount": "38.00", "currency": "USD"}, "isin": null}]}

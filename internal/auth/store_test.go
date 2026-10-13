@@ -119,9 +119,8 @@ func TestWithoutAKeyringTheTokenGoesToAPrivateFile(t *testing.T) {
 	if perm := dir.Mode().Perm(); perm != 0o700 {
 		t.Errorf("directory mode %04o, want 0700", perm)
 	}
-	leftovers, _ := filepath.Glob(filepath.Join(filepath.Dir(s.File), ".tokens-*"))
-	if len(leftovers) > 0 {
-		t.Errorf("temporary files left behind: %v", leftovers)
+	if entries, _ := os.ReadDir(filepath.Dir(s.File)); len(entries) != 1 {
+		t.Errorf("%d files next to the token file, want none: temporary files left behind?", len(entries)-1)
 	}
 
 	tok := load(t, s, "quantic.finance")
