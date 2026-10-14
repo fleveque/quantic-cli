@@ -8,8 +8,8 @@ milestone is about goroutines, about waiting for them, and about deciding what p
 means. It's also about two small Go details: money in a slice, and the difference between `nil`
 and empty.
 
-*Also readable as a [formatted page](https://claude.ai/artifact/LESSON05). The code, file by file:
-[walkthrough](https://claude.ai/artifact/WALKTHROUGH05).*
+*Also readable as a [formatted page](https://claude.ai/artifact/VpBiP5EfMBe9DqRJbByqpo). The code, file by file:
+[walkthrough](https://claude.ai/artifact/BtpJFr2EwPNmWyJdJGny9h).*
 
 ---
 
