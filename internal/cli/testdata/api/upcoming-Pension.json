@@ -1,0 +1,66 @@
+{
+  "items": [
+    {
+      "name": "Realty Income",
+      "symbol": "O",
+      "expected": {
+        "currency": "USD",
+        "amount": "10.94"
+      },
+      "ex_dividend_date": "2026-10-17",
+      "pay_date": null,
+      "shares": "40",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.2736"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "9.30"
+      }
+    },
+    {
+      "name": "Iberdrola",
+      "symbol": "IBE.MC",
+      "expected": {
+        "currency": "EUR",
+        "amount": "307.71"
+      },
+      "ex_dividend_date": "2026-10-21",
+      "pay_date": null,
+      "shares": "900",
+      "held": true,
+      "per_share": {
+        "currency": "EUR",
+        "amount": "0.3419"
+      },
+      "expected_net": {
+        "currency": "EUR",
+        "amount": "307.71"
+      }
+    },
+    {
+      "name": "Verizon Communications",
+      "symbol": "VZ",
+      "expected": {
+        "currency": "USD",
+        "amount": "157.45"
+      },
+      "ex_dividend_date": "2026-11-01",
+      "pay_date": "2026-11-02",
+      "shares": "220",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.7157"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "133.83"
+      }
+    }
+  ],
+  "from": "2026-10-14",
+  "days": 45
+}

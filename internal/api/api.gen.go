@@ -340,6 +340,43 @@ type StockSearch struct {
 	} `json:"results"`
 }
 
+// Upcoming defines model for Upcoming.
+type Upcoming struct {
+	Days int `json:"days"`
+
+	// From Today, UTC.
+	From openapi_types.Date `json:"from"`
+
+	// Items Soonest first, by the first of the two dates still to come.
+	Items []struct {
+		// ExDividendDate Can be past when the payment is still to come: the dividend is yours.
+		ExDividendDate *openapi_types.Date `json:"ex_dividend_date"`
+
+		// Expected per_share × shares, in the stock's currency. Null on the radar.
+		Expected *Money `json:"expected"`
+
+		// ExpectedNet expected, net of estimated foreign withholding.
+		ExpectedNet *Money `json:"expected_net,omitempty"`
+
+		// Held True for a holding; false for a stock on your radar.
+		Held    bool                `json:"held"`
+		Name    *string             `json:"name,omitempty"`
+		PayDate *openapi_types.Date `json:"pay_date"`
+
+		// PerShare This payment per share: the forward annual rate over the payments a year. An estimate until the dividend is declared.
+		PerShare *Money `json:"per_share"`
+
+		// Portfolio Which portfolio, when you have more than one and didn't pick one.
+		Portfolio *string `json:"portfolio,omitempty"`
+
+		// Shares Null on the radar.
+		Shares *string `json:"shares,omitempty"`
+
+		// Symbol Example: KO
+		Symbol string `json:"symbol"`
+	} `json:"items"`
+}
+
 // GetCalendarParams defines parameters for GetCalendar.
 type GetCalendarParams struct {
 	// Days How far ahead, 1 to 120. Default 45.
@@ -383,6 +420,15 @@ type GetIncomeParams struct {
 type SearchStocksParams struct {
 	// Q Ticker or name.
 	Q string `form:"q" json:"q"`
+}
+
+// ListUpcomingParams defines parameters for ListUpcoming.
+type ListUpcomingParams struct {
+	// Days How far ahead, 1 to 120. Default 45.
+	Days *int `form:"days,omitempty" json:"days,omitempty"`
+
+	// Portfolio A portfolio name or slug, case-insensitive. Omitted: all portfolios and your radar. Given: that portfolio's holdings only.
+	Portfolio *string `form:"portfolio,omitempty" json:"portfolio,omitempty"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
@@ -512,6 +558,13 @@ type ClientInterface interface {
 	//
 	// Corresponds with GET /api/v1/stocks/{symbol} (the `GetStock` operationId).
 	GetStock(ctx context.Context, symbol string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListUpcoming Your next dividends
+	//
+	// Each holding, and each stock on your radar, whose ex-dividend or payment date falls in the next `days` days: both dates, this payment per share and, for a holding, what it should pay you, gross and net of estimated withholding.
+	//
+	// Corresponds with GET /api/v1/upcoming (the `ListUpcoming` operationId).
+	ListUpcoming(ctx context.Context, params *ListUpcomingParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 // GetCalendar Upcoming ex-dividend dates
@@ -638,6 +691,23 @@ func (c *genClient) SearchStocks(ctx context.Context, params *SearchStocksParams
 // Corresponds with GET /api/v1/stocks/{symbol} (the `GetStock` operationId).
 func (c *genClient) GetStock(ctx context.Context, symbol string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetStockRequest(c.Server, symbol)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// ListUpcoming Your next dividends
+//
+// Each holding, and each stock on your radar, whose ex-dividend or payment date falls in the next `days` days: both dates, this payment per share and, for a holding, what it should pay you, gross and net of estimated withholding.
+//
+// Corresponds with GET /api/v1/upcoming (the `ListUpcoming` operationId).
+func (c *genClient) ListUpcoming(ctx context.Context, params *ListUpcomingParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUpcomingRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1062,6 +1132,72 @@ func NewGetStockRequest(server string, symbol string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewListUpcomingRequest constructs an http.Request for the ListUpcoming method
+func NewListUpcomingRequest(server string, params *ListUpcomingParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/upcoming")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		// queryValues collects non-styled parameters (passthrough, JSON)
+		// that are safe to round-trip through url.Values.Encode().
+		queryValues := queryURL.Query()
+		// rawQueryFragments collects pre-encoded query fragments from
+		// styled parameters, preserving literal commas as delimiters
+		// per the OpenAPI spec (e.g. "color=blue,black,brown").
+		var rawQueryFragments []string
+
+		if params.Days != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "days", *params.Days, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if params.Portfolio != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "portfolio", *params.Portfolio, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else {
+				for _, qp := range strings.Split(queryFrag, "&") {
+					rawQueryFragments = append(rawQueryFragments, qp)
+				}
+			}
+
+		}
+
+		if encoded := queryValues.Encode(); encoded != "" {
+			rawQueryFragments = append(rawQueryFragments, encoded)
+		}
+		queryURL.RawQuery = strings.Join(rawQueryFragments, "&")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *genClient) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1175,6 +1311,15 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with GET /api/v1/stocks/{symbol} (the `GetStock` operationId).
 	GetStockWithResponse(ctx context.Context, symbol string, reqEditors ...RequestEditorFn) (*GetStockResponse, error)
+
+	// ListUpcomingWithResponse Your next dividends
+	//
+	// Each holding, and each stock on your radar, whose ex-dividend or payment date falls in the next `days` days: both dates, this payment per share and, for a holding, what it should pay you, gross and net of estimated withholding.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /api/v1/upcoming (the `ListUpcoming` operationId).
+	ListUpcomingWithResponse(ctx context.Context, params *ListUpcomingParams, reqEditors ...RequestEditorFn) (*ListUpcomingResponse, error)
 }
 
 type GetCalendarResponse struct {
@@ -1603,6 +1748,61 @@ func (r GetStockResponse) ContentType() string {
 	return ""
 }
 
+type ListUpcomingResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *Upcoming
+	// JSON401 the response for an HTTP 401 `application/json` response
+	JSON401 *Error
+	// JSON422 the response for an HTTP 422 `application/json` response
+	JSON422 *Error
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r ListUpcomingResponse) GetJSON200() *Upcoming {
+	return r.JSON200
+}
+
+// GetJSON401 returns the response for an HTTP 401 `application/json` response
+func (r ListUpcomingResponse) GetJSON401() *Error {
+	return r.JSON401
+}
+
+// GetJSON422 returns the response for an HTTP 422 `application/json` response
+func (r ListUpcomingResponse) GetJSON422() *Error {
+	return r.JSON422
+}
+
+// GetBody returns the raw response body bytes
+func (r ListUpcomingResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r ListUpcomingResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListUpcomingResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r ListUpcomingResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 // GetCalendarWithResponse Upcoming ex-dividend dates
 //
 // Every stock Quantic tracks going ex-dividend in the next `days` days, soonest first. Public: no token needed. Buy before the ex-date to receive the next dividend.
@@ -1719,6 +1919,21 @@ func (c *ClientWithResponses) GetStockWithResponse(ctx context.Context, symbol s
 		return nil, err
 	}
 	return ParseGetStockResponse(rsp)
+}
+
+// ListUpcomingWithResponse Your next dividends
+//
+// Each holding, and each stock on your radar, whose ex-dividend or payment date falls in the next `days` days: both dates, this payment per share and, for a holding, what it should pay you, gross and net of estimated withholding.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /api/v1/upcoming (the `ListUpcoming` operationId).
+func (c *ClientWithResponses) ListUpcomingWithResponse(ctx context.Context, params *ListUpcomingParams, reqEditors ...RequestEditorFn) (*ListUpcomingResponse, error) {
+	rsp, err := c.ListUpcoming(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListUpcomingResponse(rsp)
 }
 
 // ParseGetCalendarResponse parses an HTTP response from a GetCalendarWithResponse call
@@ -2021,6 +2236,46 @@ func ParseGetStockResponse(rsp *http.Response) (*GetStockResponse, error) {
 			return nil, err
 		}
 		response.JSON429 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListUpcomingResponse parses an HTTP response from a ListUpcomingWithResponse call
+func ParseListUpcomingResponse(rsp *http.Response) (*ListUpcomingResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListUpcomingResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Upcoming
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
 
 	}
 

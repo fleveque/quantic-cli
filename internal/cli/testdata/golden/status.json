@@ -1,0 +1,196 @@
+{
+  "schema": "quantic.cli/status/v1",
+  "fetched_at": "FETCHED_AT",
+  "stale": false,
+  "signed_in": true,
+  "portfolio": null,
+  "next": {
+    "symbol": "O",
+    "name": "Realty Income",
+    "event": "ex_date",
+    "date": "2026-10-17",
+    "in_days": 2,
+    "expected": {
+      "amount": "65.66",
+      "currency": "USD"
+    },
+    "portfolio": null
+  },
+  "this_month": {
+    "month": "2026-10",
+    "received": [
+      {
+        "amount": "49.72",
+        "currency": "GBP"
+      },
+      {
+        "amount": "141.52",
+        "currency": "USD"
+      }
+    ],
+    "projected": {
+      "amount": "138.60",
+      "currency": "EUR"
+    },
+    "net_of_withholding": true
+  },
+  "upcoming": [
+    {
+      "symbol": "O",
+      "name": "Realty Income",
+      "held": true,
+      "ex_date": "2026-10-17",
+      "pay_date": null,
+      "shares": "200",
+      "per_share": {
+        "amount": "0.2736",
+        "currency": "USD"
+      },
+      "expected": {
+        "amount": "54.72",
+        "currency": "USD"
+      },
+      "expected_net": {
+        "amount": "46.51",
+        "currency": "USD"
+      },
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "O",
+      "name": "Realty Income",
+      "held": true,
+      "ex_date": "2026-10-17",
+      "pay_date": null,
+      "shares": "40",
+      "per_share": {
+        "amount": "0.2736",
+        "currency": "USD"
+      },
+      "expected": {
+        "amount": "10.94",
+        "currency": "USD"
+      },
+      "expected_net": {
+        "amount": "9.30",
+        "currency": "USD"
+      },
+      "portfolio": "Pension"
+    },
+    {
+      "symbol": "JNJ",
+      "name": "Johnson & Johnson",
+      "held": true,
+      "ex_date": "2026-10-19",
+      "pay_date": null,
+      "shares": "36",
+      "per_share": {
+        "amount": "1.3643",
+        "currency": "USD"
+      },
+      "expected": {
+        "amount": "49.11",
+        "currency": "USD"
+      },
+      "expected_net": {
+        "amount": "41.74",
+        "currency": "USD"
+      },
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "held": false,
+      "ex_date": "2026-10-19",
+      "pay_date": "2026-12-10",
+      "shares": null,
+      "per_share": {
+        "amount": "0.9652",
+        "currency": "USD"
+      },
+      "expected": null,
+      "expected_net": null,
+      "portfolio": null
+    },
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "held": true,
+      "ex_date": "2026-10-20",
+      "pay_date": null,
+      "shares": "48",
+      "per_share": {
+        "amount": "0.276",
+        "currency": "USD"
+      },
+      "expected": {
+        "amount": "13.25",
+        "currency": "USD"
+      },
+      "expected_net": {
+        "amount": "11.26",
+        "currency": "USD"
+      },
+      "portfolio": "Main"
+    },
+    {
+      "symbol": "IBE.MC",
+      "name": "Iberdrola",
+      "held": true,
+      "ex_date": "2026-10-21",
+      "pay_date": null,
+      "shares": "900",
+      "per_share": {
+        "amount": "0.3419",
+        "currency": "EUR"
+      },
+      "expected": {
+        "amount": "307.71",
+        "currency": "EUR"
+      },
+      "expected_net": {
+        "amount": "307.71",
+        "currency": "EUR"
+      },
+      "portfolio": "Pension"
+    },
+    {
+      "symbol": "PG",
+      "name": "Procter & Gamble",
+      "held": false,
+      "ex_date": "2026-10-27",
+      "pay_date": null,
+      "shares": null,
+      "per_share": {
+        "amount": "1.1043",
+        "currency": "USD"
+      },
+      "expected": null,
+      "expected_net": null,
+      "portfolio": null
+    },
+    {
+      "symbol": "KO",
+      "name": "Coca-Cola",
+      "held": true,
+      "ex_date": "2026-10-28",
+      "pay_date": null,
+      "shares": "130",
+      "per_share": {
+        "amount": "0.5398",
+        "currency": "USD"
+      },
+      "expected": {
+        "amount": "70.17",
+        "currency": "USD"
+      },
+      "expected_net": {
+        "amount": "59.64",
+        "currency": "USD"
+      },
+      "portfolio": "Main"
+    }
+  ],
+  "errors": []
+}

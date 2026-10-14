@@ -1,0 +1,73 @@
+# upcoming, and status: the widget's one call (design §8). TEST_NOW is the
+# clock: status's "this month" and "in 2 days" are from it.
+
+env TEST_NOW=2026-10-15T09:00:00Z
+
+# Signed out: exit 4, and with --json a document that says so.
+exits 4 quantic status --json
+stdout '"signed_in": false'
+stderr '^quantic: not signed in to 127\.0\.0\.1:\d+; run: quantic auth login'
+! exists requests.log
+
+env QUANTIC_TOKEN=qtc_script
+
+exec quantic upcoming --days 7
+stdout '^2026-10-17 +- +O +Realty Income +200 +0\.2736 USD +54\.72 USD +46\.51 USD$'
+grep '^GET /api/v1/upcoming\?days=7 Bearer qtc_script$' requests.log
+
+exec quantic status
+stdout '^Next +O goes ex-dividend in 2 days \(2026-10-17\), 54\.72 USD$'
+stdout '^October +58\.50 GBP received; 138\.60 EUR in a typical October$'
+grep '^GET /api/v1/upcoming\?days=14 Bearer qtc_script$' requests.log
+grep '^GET /api/v1/dividends\?from=2026-10-01&to=2026-10-15 Bearer qtc_script$' requests.log
+grep '^GET /api/v1/income\?years=1 Bearer qtc_script$' requests.log
+
+# Twenty minutes later: upcoming (fresh for an hour) from the cache; income
+# and dividends (fresh for 15 minutes) asked again.
+env TEST_NOW=2026-10-15T09:20:00Z
+exec quantic status
+grep -count=1 '^GET /api/v1/upcoming\?days=14 ' requests.log
+grep -count=2 '^GET /api/v1/income\?years=1 ' requests.log
+
+# Offline at 09:50: upcoming still fresh, the other two stale copies. The
+# whole is stale if any part is, as old as its oldest part, and warns once.
+mkdir quantic/down
+env TEST_NOW=2026-10-15T09:50:00Z
+exec quantic status --json
+stdout '"fetched_at": "2026-10-15T09:00:00Z",\n  "stale": true'
+stdout '"symbol": "O"'
+stdout '"amount": "138\.60"'
+stderr -count=1 '^quantic: '
+stderr '^quantic: can''t reach 127\.0\.0\.1:\d+; this is what it said at 2026-10-15 09:00 UTC, 50 minutes ago$'
+
+# Nothing cached for another portfolio: every part fails, exit 3.
+exits 3 quantic status --portfolio Pension
+! stdout .
+
+-- quantic/tokens --
+qtc_script
+-- quantic/api/v1/upcoming --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"from": "2026-10-15", "days": 14, "items": [
+  {"symbol": "O", "name": "Realty Income", "held": true, "ex_dividend_date": "2026-10-17", "pay_date": null,
+   "shares": "200", "per_share": {"amount": "0.2736", "currency": "USD"},
+   "expected": {"amount": "54.72", "currency": "USD"}, "expected_net": {"amount": "46.51", "currency": "USD"}}]}
+-- quantic/api/v1/dividends --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"dividends": [
+  {"date": "2026-10-15", "symbol": "DGE.L", "name": "Diageo plc", "source": "manual",
+   "amount": {"amount": "58.50", "currency": "GBP"}, "net": {"amount": "49.72", "currency": "GBP"},
+   "withholding_tax": null, "per_share_amount": null, "quantity": 130, "isin": null}]}
+-- quantic/api/v1/income --
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"annual_income": {"amount": "1283.53", "currency": "EUR"}, "net_annual_income": {"amount": "1182.80", "currency": "EUR"},
+ "current_yield_pct": 4.25, "growth_rate": 0.0, "drip": false, "years": 1, "holdings": [],
+ "projection": [{"year_offset": 0, "income": {"amount": "1283.53", "currency": "EUR"}, "net_income": {"amount": "1182.80", "currency": "EUR"}}],
+ "income_year": {"by_month": {"10": {"amount": "138.60", "currency": "EUR"}}, "average_month": {"amount": "106.96", "currency": "EUR"},
+   "net_of_withholding": false, "biggest_months": [10], "biggest_months_share": 0.3, "thin_months": [], "empty_months": []}}

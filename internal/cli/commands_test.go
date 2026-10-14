@@ -25,12 +25,15 @@ var update = flag.Bool("update", false, "rewrite testdata/golden from the curren
 const testToken = "qtc_test"
 
 // private are the paths that need a token, as in Quantic.
-var private = []string{"/api/v1/me", "/api/v1/portfolios", "/api/v1/holdings", "/api/v1/dividends", "/api/v1/income"}
+var private = []string{"/api/v1/me", "/api/v1/portfolios", "/api/v1/holdings", "/api/v1/dividends", "/api/v1/income", "/api/v1/upcoming"}
 
 // fakeQuantic serves testdata/api: GET /api/v1/calendar is calendar.json,
 // /api/v1/stocks/KO is stock-KO.json, /api/v1/stocks?q=coca is
 // search-coca.json, /api/v1/holdings?portfolio=Pension is
-// holdings-Pension.json. The private paths answer 401 without
+// holdings-Pension.json. A file named with the whole query as well, after an
+// @ (dividends@from=2026-10-01&to=2026-10-15.json; Windows allows no ? in a
+// file name), wins over those. The
+// private paths answer 401 without
 // "Bearer qtc_test", and a portfolio with no file gets Quantic's 422.
 // Anything else is Quantic's 404. QUANTIC_URL points at it for the rest of
 // the test, and the requests it got are returned, as "GET /path?query", for
@@ -80,7 +83,10 @@ func startFakeQuantic(t *testing.T) (*httptest.Server, *[]string) {
 		case strings.HasPrefix(r.URL.Path, "/api/v1/stocks/"):
 			name = "stock-" + strings.TrimPrefix(r.URL.Path, "/api/v1/stocks/")
 		}
-		body, err := os.ReadFile(filepath.Join("testdata", "api", name+".json"))
+		body, err := os.ReadFile(filepath.Join("testdata", "api", strings.TrimPrefix(r.URL.Path, "/api/v1/")+"@"+r.URL.RawQuery+".json"))
+		if err != nil {
+			body, err = os.ReadFile(filepath.Join("testdata", "api", name+".json"))
+		}
 		if err != nil && r.URL.Query().Has("portfolio") {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			msg := fmt.Sprintf("Unknown portfolio %q. Available portfolios: Main, Pension.", r.URL.Query().Get("portfolio"))
@@ -137,10 +143,18 @@ func TestGolden(t *testing.T) {
 		// Hand-written: only two months, and none of the lists Quantic may leave out.
 		{"income-Sparse.txt", []string{"income", "--years", "1", "--portfolio", "Sparse"}},
 		{"income-Sparse.json", []string{"income", "--years", "1", "--portfolio", "Sparse", "--json"}},
+		{"upcoming.txt", []string{"upcoming"}},
+		{"upcoming.json", []string{"upcoming", "--json"}},
+		{"upcoming-Pension.txt", []string{"upcoming", "--portfolio", "Pension"}},
+		{"status.txt", []string{"status"}},
+		{"status.json", []string{"status", "--json"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.golden, func(t *testing.T) {
-			code, stdout, stderr := run(t, tt.args...)
+			// status says "tomorrow" and "this month": its clock is the day
+			// its fixtures were recorded for, when October's dividends had
+			// been paid, on the 15th.
+			code, stdout, stderr := runAt(t, time.Date(2026, 10, 15, 9, 0, 0, 0, time.UTC), tt.args...)
 			if code != cli.ExitOK || stderr != "" {
 				t.Fatalf("exit %d, stderr %q", code, stderr)
 			}
@@ -265,6 +279,8 @@ func TestCommandUsage(t *testing.T) {
 		{[]string{"dividends", "--to", "yesterday"}, `--to "yesterday" isn't a date like 2026-01-31`},
 		{[]string{"dividends", "--from", "2026-02-01", "--to", "2026-01-01"}, "--to (2026-01-01) is before --from (2026-02-01)"},
 		{[]string{"income", "--years", "0"}, "--years must be at least 1, got 0"},
+		{[]string{"upcoming", "--days", "0"}, "--days must be at least 1, got 0"},
+		{[]string{"status", "KO"}, `unknown command "KO" for "quantic status"`},
 		{[]string{"holdings", "KO"}, `unknown command "KO" for "quantic holdings"`},
 	}
 	for _, tt := range tests {
@@ -291,7 +307,7 @@ func TestBadQuanticURL(t *testing.T) {
 func TestUnknownPortfolio(t *testing.T) {
 	fakeQuantic(t)
 	t.Setenv("QUANTIC_TOKEN", testToken)
-	for _, cmd := range []string{"holdings", "dividends", "income"} {
+	for _, cmd := range []string{"holdings", "dividends", "income", "upcoming"} {
 		code, stdout, stderr := run(t, cmd, "--portfolio", "nope")
 		if code != cli.ExitUsage || stdout != "" ||
 			stderr != "quantic: Unknown portfolio \"nope\". Available portfolios: Main, Pension.\nRun 'quantic --help' for usage.\n" {

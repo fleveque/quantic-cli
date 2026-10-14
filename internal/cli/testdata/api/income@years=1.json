@@ -1,0 +1,240 @@
+{
+  "projection": [
+    {
+      "year_offset": 0,
+      "income": {
+        "currency": "EUR",
+        "amount": "2756.19"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "2495.16"
+      }
+    },
+    {
+      "year_offset": 1,
+      "income": {
+        "currency": "EUR",
+        "amount": "2756.19"
+      },
+      "net_income": {
+        "currency": "EUR",
+        "amount": "2495.16"
+      }
+    }
+  ],
+  "years": 1,
+  "holdings": [
+    {
+      "symbol": "IBE.MC",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "615.48"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "615.48"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "O",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "586.60"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "498.61"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "VZ",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "562.70"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "478.30"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "SAN.MC",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "329.57"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "329.57"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "KO",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "250.76"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "213.15"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "JNJ",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "175.52"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "149.19"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "O",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "117.32"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "99.72"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "DGE.L",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "70.90"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "70.90"
+      },
+      "streak": null
+    },
+    {
+      "symbol": "AAPL",
+      "cagr_5y": null,
+      "income": {
+        "currency": "EUR",
+        "amount": "47.34"
+      },
+      "growth": null,
+      "net_income": {
+        "currency": "EUR",
+        "amount": "40.24"
+      },
+      "streak": null
+    }
+  ],
+  "growth_rate": 0.0,
+  "drip": false,
+  "annual_income": {
+    "currency": "EUR",
+    "amount": "2756.19"
+  },
+  "net_annual_income": {
+    "currency": "EUR",
+    "amount": "2495.16"
+  },
+  "income_year": {
+    "net_of_withholding": true,
+    "by_month": {
+      "1": {
+        "currency": "EUR",
+        "amount": "357.60"
+      },
+      "2": {
+        "currency": "EUR",
+        "amount": "179.49"
+      },
+      "3": {
+        "currency": "EUR",
+        "amount": "87.16"
+      },
+      "4": {
+        "currency": "EUR",
+        "amount": "138.60"
+      },
+      "5": {
+        "currency": "EUR",
+        "amount": "344.28"
+      },
+      "6": {
+        "currency": "EUR",
+        "amount": "87.16"
+      },
+      "7": {
+        "currency": "EUR",
+        "amount": "410.89"
+      },
+      "8": {
+        "currency": "EUR",
+        "amount": "179.49"
+      },
+      "9": {
+        "currency": "EUR",
+        "amount": "87.16"
+      },
+      "10": {
+        "currency": "EUR",
+        "amount": "138.60"
+      },
+      "11": {
+        "currency": "EUR",
+        "amount": "344.28"
+      },
+      "12": {
+        "currency": "EUR",
+        "amount": "140.44"
+      }
+    },
+    "thin_months": [
+      3,
+      6,
+      9,
+      4,
+      10,
+      12,
+      2,
+      8
+    ],
+    "empty_months": [],
+    "average_month": {
+      "currency": "EUR",
+      "amount": "207.93"
+    },
+    "biggest_months": [
+      1,
+      5,
+      7
+    ],
+    "biggest_months_share": 0.446
+  },
+  "current_yield_pct": 2.99
+}

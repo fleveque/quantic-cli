@@ -109,6 +109,16 @@ func fetch[T any](cmd *cobra.Command, opts *Options, n need, call func(context.C
 // callQuantic is fetch for a session already found: `auth login` makes its
 // own, with the token it is about to store.
 func callQuantic[T any](cmd *cobra.Command, opts *Options, s session, call func(context.Context, *api.Client) (*T, error)) (*T, fetched, error) {
+	v, at, err := askQuantic(cmd, opts, s, call)
+	if err == nil && at.Stale {
+		warnStale(cmd, opts, s, at)
+	}
+	return v, at, err
+}
+
+// askQuantic is callQuantic without the warning on stderr when the answer is
+// a stale copy: `status` asks three times at once, and warns once.
+func askQuantic[T any](cmd *cobra.Command, opts *Options, s session, call func(context.Context, *api.Client) (*T, error)) (*T, fetched, error) {
 	cfg := api.Config{BaseURL: s.base, UserAgent: opts.userAgent, Token: s.token.Secret}
 	var cached *cache.Transport
 	if dir := opts.cacheDir(); dir != "" && !opts.NoCache && !s.noCache {
@@ -131,11 +141,14 @@ func callQuantic[T any](cmd *cobra.Command, opts *Options, s session, call func(
 		return v, fetched{At: opts.now()}, nil
 	}
 	last := cached.Last()
-	if last.Stale {
-		fmt.Fprintf(cmd.ErrOrStderr(), "quantic: can't reach %s; this is what it said at %s UTC, %s\n",
-			s.host, last.FetchedAt.UTC().Format("2006-01-02 15:04"), ago(opts.now().Sub(last.FetchedAt)))
-	}
 	return v, fetched{At: last.FetchedAt, Stale: last.Stale}, nil
+}
+
+// warnStale says on stderr that Quantic couldn't be reached, and how old the
+// cached answer is instead.
+func warnStale(cmd *cobra.Command, opts *Options, s session, at fetched) {
+	fmt.Fprintf(cmd.ErrOrStderr(), "quantic: can't reach %s; this is what it said at %s UTC, %s\n",
+		s.host, at.At.UTC().Format("2006-01-02 15:04"), ago(opts.now().Sub(at.At)))
 }
 
 // ago says how long ago, as people do: "40 minutes ago", not "40m0s".
@@ -171,7 +184,7 @@ func freshFor(req *http.Request) time.Duration {
 		return 15 * time.Minute
 	case strings.HasPrefix(p, "/api/v1/stocks/"):
 		return 15 * time.Minute // prices move
-	case p == "/api/v1/stocks", p == "/api/v1/portfolios":
+	case p == "/api/v1/stocks", p == "/api/v1/portfolios", p == "/api/v1/upcoming":
 		return time.Hour
 	}
 	return 0

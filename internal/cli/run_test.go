@@ -9,6 +9,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/fleveque/quantic-cli/internal/auth"
 	"github.com/fleveque/quantic-cli/internal/auth/authtest"
@@ -50,11 +51,22 @@ var sharedCache string
 // come round again in a later test, and its answers must not.
 func runWith(t *testing.T, keyring auth.Keyring, stdin string, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
+	return runDeps(t, cli.Deps{Keyring: keyring}, stdin, args...)
+}
+
+// runAt is run on a day of the test's choosing: the clock is at.
+func runAt(t *testing.T, at time.Time, args ...string) (code int, stdout, stderr string) {
+	t.Helper()
+	return runDeps(t, cli.Deps{Keyring: &authtest.Keyring{}, Now: func() time.Time { return at }}, "", args...)
+}
+
+func runDeps(t *testing.T, deps cli.Deps, stdin string, args ...string) (code int, stdout, stderr string) {
+	t.Helper()
 	if os.Getenv("XDG_CACHE_HOME") == sharedCache {
 		t.Setenv("XDG_CACHE_HOME", t.TempDir())
 	}
 	var out, errOut bytes.Buffer
-	code = cli.RunWith(args, strings.NewReader(stdin), &out, &errOut, release, cli.Deps{Keyring: keyring})
+	code = cli.RunWith(args, strings.NewReader(stdin), &out, &errOut, release, deps)
 	return code, out.String(), errOut.String()
 }
 

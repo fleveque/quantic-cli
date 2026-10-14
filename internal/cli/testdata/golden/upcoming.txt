@@ -1,0 +1,12 @@
+EX-DATE     PAY DATE    SYMBOL  NAME                    SHARES   PER SHARE    EXPECTED         NET  PORTFOLIO
+2026-10-17  -           O       Realty Income              200  0.2736 USD   54.72 USD   46.51 USD  Main
+2026-10-17  -           O       Realty Income               40  0.2736 USD   10.94 USD    9.30 USD  Pension
+2026-10-19  -           JNJ     Johnson & Johnson           36  1.3643 USD   49.11 USD   41.74 USD  Main
+2026-10-19  2026-12-10  MSFT    Microsoft                radar  0.9652 USD           -           -  -
+2026-10-20  -           AAPL    Apple Inc.                  48   0.276 USD   13.25 USD   11.26 USD  Main
+2026-10-21  -           IBE.MC  Iberdrola                  900  0.3419 EUR  307.71 EUR  307.71 EUR  Pension
+2026-10-27  -           PG      Procter & Gamble         radar  1.1043 USD           -           -  -
+2026-10-28  -           KO      Coca-Cola                  130  0.5398 USD   70.17 USD   59.64 USD  Main
+2026-10-30  -           SAN.MC  Banco Santander           1300  0.1268 EUR  164.84 EUR  164.84 EUR  Main
+2026-11-01  -           DGE.L   Diageo plc                 130  0.2305 GBP   29.97 GBP   29.97 GBP  Main
+2026-11-01  2026-11-02  VZ      Verizon Communications     220  0.7157 USD  157.45 USD  133.83 USD  Pension
