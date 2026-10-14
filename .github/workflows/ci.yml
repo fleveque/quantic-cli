@@ -95,7 +95,7 @@ jobs:
         if: hashFiles('.goreleaser.yaml') != ''
         run: |
           got="$(dist/quantic_linux_amd64_v1/quantic version --json | jq -r .version)"
-          want="$(jq -r .version dist/metadata.json)"
+          want="v$(jq -r .version dist/metadata.json)"
           echo "binary: $got, release: $want"
           [ "$got" = "$want" ]
 

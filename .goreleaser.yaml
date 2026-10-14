@@ -25,10 +25,11 @@ builds:
     flags:
       - -trimpath
     # main.version, main.commit and main.date (cmd/quantic/main.go). The
-    # commit's date, not the build's, and the commit's time on every file:
-    # the same tag builds the same bytes.
+    # version keeps the tag's "v", as `go install …@v0.1.0` reports it, so
+    # both say the same. The commit's date, not the build's, and the
+    # commit's time on every file: the same tag builds the same bytes.
     ldflags:
-      - -s -w -X main.version={{ .Version }} -X main.commit={{ .ShortCommit }} -X main.date={{ .CommitDate }}
+      - -s -w -X main.version=v{{ .Version }} -X main.commit={{ .ShortCommit }} -X main.date={{ .CommitDate }}
     mod_timestamp: "{{ .CommitTimestamp }}"
 
 archives:

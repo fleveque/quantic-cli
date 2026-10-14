@@ -59,18 +59,23 @@ var (
 ```
 
 The linker can set a package-level string variable from the command line:
-`-ldflags "-X main.version=0.1.0"`. GoReleaser passes one `-X` for each, from the tag. Without
+`-ldflags "-X main.version=v0.1.0"`. GoReleaser passes one `-X` for each, from the tag. Without
 them, milestone 1's fallback reads what the Go toolchain recorded in the binary
 (`debug.ReadBuildInfo`), which is a pseudo-version. To see the difference, I took the `-X` for
 `version` out of the release config and built:
 
 ```
-binary: v0.0.0-20261014172258-b761cb87c530+dirty, release: 0.0.0-SNAPSHOT-b761cb8
+broken -> binary: v0.0.0-20261014173815-aa61c19bc32f+dirty, release: v0.0.0-SNAPSHOT-aa61c19
 ```
 
 The binary said what the toolchain knew: a commit, its time, and `+dirty` because my working tree
 had changes. The release said something else. CI now runs exactly that comparison on every PR:
 the release binary must report the release's version.
+
+One more detail. GoReleaser's `{{ .Version }}` is the tag without its `v`: `0.1.0`. But
+`go install …@v0.1.0` reports `v0.1.0`, so the same release would have printed two versions
+depending on how you installed it. The flag is `-X main.version=v{{ .Version }}`. I only noticed
+because I read the snapshot's `quantic version` closely.
 
 In Elixir the version lives in `mix.exs` and is compiled in. In Ruby it's a constant in
 `version.rb`. Go has neither convention. The version is whatever the linker is told, which is why
@@ -169,7 +174,7 @@ package managers. So the author decides when.
 
 | Broken | Caught by |
 |---|---|
-| no `-X main.version` | CI's "Release binary knows its version" (`v0.0.0-…+dirty` against `0.0.0-SNAPSHOT-…`) |
+| no `-X main.version` | CI's "Release binary knows its version" (`v0.0.0-…+dirty` against `v0.0.0-SNAPSHOT-…`) |
 | `completion` switched off again | `help.txtar` |
 | the help check reading the wrong command's output | `help.txtar`'s first version passed whatever happened; it now runs `quantic --help` first, and fails when that's swapped for `quantic version` |
 | archive files at build time and owner | two snapshot builds give different checksums (checked by hand, not in CI: it would double the build) |
