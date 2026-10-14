@@ -30,8 +30,9 @@ var private = []string{"/api/v1/me", "/api/v1/portfolios", "/api/v1/holdings", "
 // fakeQuantic serves testdata/api: GET /api/v1/calendar is calendar.json,
 // /api/v1/stocks/KO is stock-KO.json, /api/v1/stocks?q=coca is
 // search-coca.json, /api/v1/holdings?portfolio=Pension is
-// holdings-Pension.json. A file named with the whole query as well
-// (dividends?from=2026-10-01&to=2026-10-15.json) wins over those. The
+// holdings-Pension.json. A file named with the whole query as well, after an
+// @ (dividends@from=2026-10-01&to=2026-10-15.json; Windows allows no ? in a
+// file name), wins over those. The
 // private paths answer 401 without
 // "Bearer qtc_test", and a portfolio with no file gets Quantic's 422.
 // Anything else is Quantic's 404. QUANTIC_URL points at it for the rest of
@@ -82,7 +83,7 @@ func startFakeQuantic(t *testing.T) (*httptest.Server, *[]string) {
 		case strings.HasPrefix(r.URL.Path, "/api/v1/stocks/"):
 			name = "stock-" + strings.TrimPrefix(r.URL.Path, "/api/v1/stocks/")
 		}
-		body, err := os.ReadFile(filepath.Join("testdata", "api", strings.TrimPrefix(r.URL.Path, "/api/v1/")+"?"+r.URL.RawQuery+".json"))
+		body, err := os.ReadFile(filepath.Join("testdata", "api", strings.TrimPrefix(r.URL.Path, "/api/v1/")+"@"+r.URL.RawQuery+".json"))
 		if err != nil {
 			body, err = os.ReadFile(filepath.Join("testdata", "api", name+".json"))
 		}

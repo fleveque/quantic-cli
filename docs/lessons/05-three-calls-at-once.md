@@ -281,7 +281,7 @@ recorded for. `runAt` passes it in through lesson 04's `Deps.Now`.
 
 - **Golden files** for `upcoming` (table, JSON, one portfolio) and `status` (table and JSON), from
   answers recorded from a demo user on a local Quantic. The fake Quantic now serves a file named
-  with the whole query first (`dividends?from=2026-10-01&to=2026-10-15.json`), so `status`'s month
+  with the whole query first (`dividends@from=2026-10-01&to=2026-10-15.json`), so `status`'s month
   is its own fixture.
 - **`status_test.go`**: the three calls at once, one part failing, all failing (offline, an unknown
   portfolio), signed out, and the exact three requests with `--portfolio`.
