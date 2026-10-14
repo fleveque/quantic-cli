@@ -154,6 +154,8 @@ Environment:
 		newHoldingsCmd(opts),
 		newDividendsCmd(opts),
 		newIncomeCmd(opts),
+		newUpcomingCmd(opts),
+		newStatusCmd(opts),
 		newCacheCmd(opts),
 		newCalendarCmd(opts),
 		newStockCmd(opts),

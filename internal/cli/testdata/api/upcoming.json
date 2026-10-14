@@ -1,0 +1,223 @@
+{
+  "items": [
+    {
+      "name": "Realty Income",
+      "symbol": "O",
+      "expected": {
+        "currency": "USD",
+        "amount": "54.72"
+      },
+      "ex_dividend_date": "2026-10-17",
+      "pay_date": null,
+      "shares": "200",
+      "portfolio": "Main",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.2736"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "46.51"
+      }
+    },
+    {
+      "name": "Realty Income",
+      "symbol": "O",
+      "expected": {
+        "currency": "USD",
+        "amount": "10.94"
+      },
+      "ex_dividend_date": "2026-10-17",
+      "pay_date": null,
+      "shares": "40",
+      "portfolio": "Pension",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.2736"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "9.30"
+      }
+    },
+    {
+      "name": "Johnson & Johnson",
+      "symbol": "JNJ",
+      "expected": {
+        "currency": "USD",
+        "amount": "49.11"
+      },
+      "ex_dividend_date": "2026-10-19",
+      "pay_date": null,
+      "shares": "36",
+      "portfolio": "Main",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "1.3643"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "41.74"
+      }
+    },
+    {
+      "name": "Microsoft",
+      "symbol": "MSFT",
+      "expected": null,
+      "ex_dividend_date": "2026-10-19",
+      "pay_date": "2026-12-10",
+      "shares": null,
+      "held": false,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.9652"
+      },
+      "expected_net": null
+    },
+    {
+      "name": "Apple Inc.",
+      "symbol": "AAPL",
+      "expected": {
+        "currency": "USD",
+        "amount": "13.25"
+      },
+      "ex_dividend_date": "2026-10-20",
+      "pay_date": null,
+      "shares": "48",
+      "portfolio": "Main",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.276"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "11.26"
+      }
+    },
+    {
+      "name": "Iberdrola",
+      "symbol": "IBE.MC",
+      "expected": {
+        "currency": "EUR",
+        "amount": "307.71"
+      },
+      "ex_dividend_date": "2026-10-21",
+      "pay_date": null,
+      "shares": "900",
+      "portfolio": "Pension",
+      "held": true,
+      "per_share": {
+        "currency": "EUR",
+        "amount": "0.3419"
+      },
+      "expected_net": {
+        "currency": "EUR",
+        "amount": "307.71"
+      }
+    },
+    {
+      "name": "Procter & Gamble",
+      "symbol": "PG",
+      "expected": null,
+      "ex_dividend_date": "2026-10-27",
+      "pay_date": null,
+      "shares": null,
+      "held": false,
+      "per_share": {
+        "currency": "USD",
+        "amount": "1.1043"
+      },
+      "expected_net": null
+    },
+    {
+      "name": "Coca-Cola",
+      "symbol": "KO",
+      "expected": {
+        "currency": "USD",
+        "amount": "70.17"
+      },
+      "ex_dividend_date": "2026-10-28",
+      "pay_date": null,
+      "shares": "130",
+      "portfolio": "Main",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.5398"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "59.64"
+      }
+    },
+    {
+      "name": "Banco Santander",
+      "symbol": "SAN.MC",
+      "expected": {
+        "currency": "EUR",
+        "amount": "164.84"
+      },
+      "ex_dividend_date": "2026-10-30",
+      "pay_date": null,
+      "shares": "1300",
+      "portfolio": "Main",
+      "held": true,
+      "per_share": {
+        "currency": "EUR",
+        "amount": "0.1268"
+      },
+      "expected_net": {
+        "currency": "EUR",
+        "amount": "164.84"
+      }
+    },
+    {
+      "name": "Diageo plc",
+      "symbol": "DGE.L",
+      "expected": {
+        "currency": "GBP",
+        "amount": "29.97"
+      },
+      "ex_dividend_date": "2026-11-01",
+      "pay_date": null,
+      "shares": "130",
+      "portfolio": "Main",
+      "held": true,
+      "per_share": {
+        "currency": "GBP",
+        "amount": "0.2305"
+      },
+      "expected_net": {
+        "currency": "GBP",
+        "amount": "29.97"
+      }
+    },
+    {
+      "name": "Verizon Communications",
+      "symbol": "VZ",
+      "expected": {
+        "currency": "USD",
+        "amount": "157.45"
+      },
+      "ex_dividend_date": "2026-11-01",
+      "pay_date": "2026-11-02",
+      "shares": "220",
+      "portfolio": "Pension",
+      "held": true,
+      "per_share": {
+        "currency": "USD",
+        "amount": "0.7157"
+      },
+      "expected_net": {
+        "currency": "USD",
+        "amount": "133.83"
+      }
+    }
+  ],
+  "from": "2026-10-14",
+  "days": 45
+}

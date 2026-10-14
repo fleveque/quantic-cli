@@ -65,7 +65,7 @@ small surface (below), only additive changes within v1, and an OpenAPI document 
 
 ### 2.1 The v1 surface
 
-**Built in S1**, all but `/upcoming` (Quantic PRs #482–#485). The reference for people is
+**Built in S1** (Quantic PRs #482–#485), and `/upcoming` in S2 (#496, #497). The reference for people is
 [quantic.finance/developers](https://quantic.finance/developers): getting a token, every endpoint,
 the conventions. For programs it's the OpenAPI document.
 
@@ -79,16 +79,16 @@ a controller and a serializer.
 | `GET /api/v1/holdings?portfolio=` | token | `get_holdings` | cost basis |
 | `GET /api/v1/dividends?symbol=&from=&to=&portfolio=` | token | `get_dividends` | received |
 | `GET /api/v1/income?portfolio=&years=` | token | `get_income_outlook` | includes `income_year` by month |
-| `GET /api/v1/upcoming?days=&portfolio=` | token | **new** | your holdings' next ex-dates, pay dates, expected amounts |
+| `GET /api/v1/upcoming?days=&portfolio=` | token | `get_upcoming_dividends` (new in S2) | your holdings' next ex-dates, pay dates, expected amounts, gross and net; your radar's dates, without amounts |
 | `GET /api/v1/calendar?days=` | none | `dividend_calendar` | public, same 60/min anonymous limit |
 | `GET /api/v1/stocks/:symbol` | none or token | `get_stock` | richer when signed in, as in MCP |
 | `GET /api/v1/stocks?q=` | none | `search_stocks` | MCP's `in_db` is `tracked` here |
 
 **`/upcoming` is the one genuinely new query**, and the reason the widget is worth having: "what is
-*my* next dividend". Today it can only be approximated by intersecting the public calendar with your
-holdings, which gives ex-dates but no pay dates and no amounts (the calendar has neither). Quantic
-already projects per-holding income for `income_outlook`, so the data is in the app. The query
-isn't, yet.
+*my* next dividend". Before S2 it could only be approximated by intersecting the public calendar
+with your holdings, which gives ex-dates but no pay dates and no amounts (the calendar has
+neither). S2 built it in Quantic and gave it to every interface there too: the MCP tool
+`get_upcoming_dividends`, the AI chat, Telegram, and the iCal feed.
 
 **Conventions:**
 - Money as `{"amount": "12.34", "currency": "EUR"}`: decimal strings, never floats.
@@ -175,11 +175,16 @@ for convenience, and it versions its own output.
 ```json
 {
   "schema": "quantic.cli/upcoming/v1",
-  "fetched_at": "2026-10-07T09:12:03Z",
+  "fetched_at": "2026-10-14T16:38:39Z",
   "stale": false,
+  "from": "2026-10-14",
+  "days": 45,
+  "portfolio": null,
   "items": [
-    {"symbol": "MSFT", "name": "Microsoft", "ex_date": "2026-10-08", "pay_date": "2026-12-11",
-     "expected": {"amount": "6.64", "currency": "USD"}, "portfolio": "Main"}
+    {"symbol": "O", "name": "Realty Income", "held": true, "ex_date": "2026-10-17", "pay_date": null,
+     "shares": "200", "per_share": {"amount": "0.2736", "currency": "USD"},
+     "expected": {"amount": "54.72", "currency": "USD"},
+     "expected_net": {"amount": "46.51", "currency": "USD"}, "portfolio": "Main"}
   ]
 }
 ```
@@ -231,23 +236,42 @@ A script or the widget can tell "log in again" (4) from "offline" (3) without pa
 ## 8. `quantic status`: one call for the widget
 
 The widget shouldn't run four commands and merge them in QML. `quantic status --json` fetches
-what a glance needs, concurrently (`errgroup`), and returns one document:
+what a glance needs, three calls to Quantic at once (`/upcoming` for 14 days, this month's
+`/dividends`, and `/income`), and returns one document:
 
 ```json
 {
   "schema": "quantic.cli/status/v1",
-  "fetched_at": "2026-10-07T09:12:03Z",
+  "fetched_at": "2026-10-15T09:00:00Z",
   "stale": false,
   "signed_in": true,
-  "next": {"symbol": "MSFT", "event": "ex_date", "date": "2026-10-08", "in_days": 1},
-  "this_month": {"received": {"amount": "42.10", "currency": "EUR"},
-                 "projected": {"amount": "118.00", "currency": "EUR"}},
-  "upcoming": [ /* next 14 days, as in section 5 */ ]
+  "portfolio": null,
+  "next": {"symbol": "O", "name": "Realty Income", "event": "ex_date", "date": "2026-10-17",
+           "in_days": 2, "expected": {"amount": "65.66", "currency": "USD"}, "portfolio": null},
+  "this_month": {"month": "2026-10",
+                 "received": [{"amount": "49.72", "currency": "GBP"}, {"amount": "141.52", "currency": "USD"}],
+                 "projected": {"amount": "138.60", "currency": "EUR"},
+                 "net_of_withholding": true},
+  "upcoming": [ /* next 14 days, as in section 5 */ ],
+  "errors": []
 }
 ```
 
-A partial failure, such as the income call failing while upcoming succeeds, returns what it has,
-with an `errors` list, and still exits 0. The widget shows what it can.
+- `next` is your holdings' first ex-date or payment from today (the radar's are left out); a
+  stock held in several portfolios is one event, its amounts added up, with no portfolio.
+- `received` is a list, one sum per currency the dividends were paid in: Quantic doesn't convert
+  them, and the CLI doesn't guess exchange rates. `projected` is a typical such month, in your
+  preferred currency. Both are net of withholding abroad, or both gross, following your setting in
+  Quantic, and `net_of_withholding` says which.
+- `fetched_at` is the oldest part's, and `stale` is true if any part is.
+- Signed out, `--json` still prints the document, with `"signed_in": false`, and exits 4.
+
+A partial failure, such as the income call failing while upcoming succeeds, returns what it has:
+the failed part is null (or empty), it's listed in `errors` as `{"part", "message"}`, and the exit
+code is 0. The widget shows what it can. When all three fail, nothing is printed and the exit code
+is theirs, as for any other command. Not `errgroup`, as first planned: with `WithContext`, its first
+error cancels the rest, which is all-or-nothing. Three goroutines and a `sync.WaitGroup` keep each part's
+error to itself.
 
 ---
 
@@ -308,19 +332,18 @@ show amounts in the bar.
 ```
 api/openapi.json        a copy of Quantic's OpenAPI document (ADR 0002)
 cmd/quantic/            main: wiring only
-internal/cli/           Cobra commands, flags, exit codes
+internal/cli/           Cobra commands, flags, exit codes; status.go composes `quantic status`
 internal/api/           client generated from Quantic's OpenAPI document, plus a thin wrapper
 internal/auth/          keyring, QUANTIC_TOKEN, the file fallback; authtest/ has keyrings for tests
 internal/cache/         files, freshness, ETags, per-entry locks
 internal/privfile/      files only their owner can read, written in one step
 internal/render/        tables (text/tabwriter) and JSON output types
-internal/status/        the concurrent composition behind `quantic status`
 ```
 
 The widget is in its own repository (section 9).
 
 **Libraries:** `spf13/cobra` (commands), `zalando/go-keyring`, `oapi-codegen` (client from
-OpenAPI), `golang.org/x/sync/errgroup`, `rogpeppe/go-internal/testscript` (tests). The terminal
+OpenAPI), `rogpeppe/go-internal/testscript` (tests). The terminal
 dashboard adds `charmbracelet/bubbletea` and `lipgloss`. Everything else from the standard library.
 
 ---
@@ -354,8 +377,8 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | 2 | Generated client; `calendar`, `stock`, `search` signed out. **Done** (#6, [ADR 0002](decisions/0002-generated-client-from-a-checked-in-spec.md)) | OpenAPI codegen, `net/http`, `context` |
 | 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income`. **Done** (#8, [ADR 0003](decisions/0003-where-the-token-lives.md)) | interfaces for secrets, OS integration |
 | 4 | Cache: freshness, ETags, offline, locks. **Done** (#9, [ADR 0004](decisions/0004-the-cache-is-a-transport.md)) | files, `encoding/json`, `flock`, time |
-| S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts | — |
-| 5 | `upcoming` and `status`, concurrently | `errgroup`, partial failure |
+| S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts, and the same in MCP, AI chat, Telegram and the iCal feed. **Done** (#496, #497) | — |
+| 5 | `upcoming` and `status`, concurrently. **In review** | goroutines, `sync.WaitGroup`, partial failure |
 | 6 | The Omarchy widget, in its own repo | (QML, not Go; consuming your own JSON contract) |
 | 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew | build flags, cross-compilation, checksums |
 | 8 | `quantic dash`: terminal dashboard | Bubble Tea (Elm architecture) |

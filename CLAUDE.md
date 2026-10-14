@@ -4,7 +4,7 @@ A read-only command-line client for Quantic Finance. Its `--json` output is a co
 programs build on, the first being an Omarchy bar widget in its own repository (design §9). It is also the author's way of learning Go: someone coming from Elixir and Ruby.
 Start with [README.md](README.md) and [docs/design.md](docs/design.md).
 
-## Status — 2026-10-08
+## Status — 2026-10-14
 
 - Milestone 0: the design. Open question 1 is decided: an `/api/v1` in Quantic
   ([ADR 0001](docs/decisions/0001-json-api-not-mcp.md)).
@@ -17,9 +17,13 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   is generated from its document with no overlay.
 - Milestone 3 is done (#8): `auth login`/`logout`/`status` with the keyring (ADR 0003), and
   `portfolios`, `holdings`, `dividends`, `income`.
-- Milestone 4 (in review): the cache (ADR 0004): freshness, ETags, stale answers offline, a lock
-  per entry; lesson 04 and walkthrough 04. Next is S2 (`/upcoming` in Quantic) and milestone 5,
-  when the author says.
+- Milestone 4 is done (#9): the cache (ADR 0004): freshness, ETags, stale answers offline, a lock
+  per entry.
+- Milestone S2 is done in `../quantic` (#496, #497): `/api/v1/upcoming`, and the same data in MCP,
+  AI chat, Telegram and the iCal feed.
+- Milestone 5 (in review): `upcoming`, and `status`, three calls at once with partial failure
+  (design §8); lesson 05 and walkthrough 05. Next is milestone 6, the Omarchy widget in its own
+  repository, when the author says.
 
 ## Conventions
 

@@ -1,0 +1,4 @@
+EX-DATE     PAY DATE    SYMBOL  NAME                    SHARES   PER SHARE    EXPECTED         NET
+2026-10-17  -           O       Realty Income               40  0.2736 USD   10.94 USD    9.30 USD
+2026-10-21  -           IBE.MC  Iberdrola                  900  0.3419 EUR  307.71 EUR  307.71 EUR
+2026-11-01  2026-11-02  VZ      Verizon Communications     220  0.7157 USD  157.45 USD  133.83 USD

@@ -3,17 +3,18 @@
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal, and in scripts and status bars through `--json`.
 
-> **Status: milestone 4 of 9.** Sign in with a personal API token, then read your own
-> `portfolios`, `holdings`, `dividends` and `income`. The public commands (`calendar`, `stock`,
-> `search`) work signed out too. Answers are cached, and when Quantic can't be reached the last
-> one is shown, marked stale. `upcoming` and `status` come in milestone 5. The API it reads is
+> **Status: milestone 5 of 9.** Sign in with a personal API token, then read your own
+> `portfolios`, `holdings`, `dividends`, `income` and `upcoming` dividends, or all at a glance with
+> `status`. The public commands (`calendar`, `stock`, `search`) work signed out too. Answers are
+> cached, and when Quantic can't be reached the last one is shown, marked stale. The Omarchy bar
+> widget, which reads `quantic status --json`, comes in milestone 6. The API it reads is
 > documented at [quantic.finance/developers](https://quantic.finance/developers). Start with the
 > [design](docs/design.md).
 
-Where it's going:
+What it does:
 
 ```
-quantic upcoming            # your holdings' next ex-dividend and payment dates
+quantic upcoming            # your holdings' next ex-dividend and payment dates, and amounts
 quantic income              # projected income, month by month
 quantic calendar --days 30  # the public ex-dividend calendar, no account needed
 quantic status --json       # one document for status bars and scripts
@@ -50,6 +51,8 @@ quantic portfolios
 quantic holdings --portfolio Main
 quantic dividends --from 2026-01-01 --symbol KO
 quantic income --years 10    # a year's income, by month, by holding, and projected
+quantic upcoming --days 30   # your next ex-dates and payments, and what each should pay
+quantic status               # your next dividend, this month's, and the next 14 days
 quantic auth logout          # forget it here; revoke it in Quantic's settings
 ```
 
@@ -87,6 +90,25 @@ Mar   85.99 EUR  █████
 ...
 ```
 
+```
+$ quantic status                # Quantic's demo portfolio
+Next     O goes ex-dividend in 3 days (2026-10-17), 65.66 USD
+October  nothing received yet; 138.60 EUR in a typical October, after withholding
+
+The next 14 days
+EX-DATE     PAY DATE    SYMBOL  NAME               SHARES   PER SHARE    EXPECTED         NET  PORTFOLIO
+2026-10-17  -           O       Realty Income         200  0.2736 USD   54.72 USD   46.51 USD  Main
+2026-10-17  -           O       Realty Income          40  0.2736 USD   10.94 USD    9.30 USD  Pension
+2026-10-19  2026-12-10  MSFT    Microsoft           radar  0.9652 USD           -           -  -
+...
+```
+
+`upcoming` lists stocks on your radar too (`radar`, with no amounts); `--portfolio` leaves them
+out. `status` makes its three calls to Quantic at once. If one fails, it shows the rest, lists
+what's missing in `"errors"`, and exits 0; only when all three fail does it exit with their
+error. Money received in different currencies is summed per currency, since Quantic doesn't
+convert it.
+
 Every `--json` output names its shape and version (`"schema": "quantic.cli/income/v1"`), with
 `fetched_at` and `stale`; a breaking change is a new version. Signed out, Quantic allows 60 calls a
 minute per IP address; a rate-limited call is retried, then exits 5. Signed in, every command sends
@@ -94,7 +116,8 @@ the token, public ones included.
 
 **The cache.** Answers are kept in `$XDG_CACHE_HOME/quantic` (`~/.cache/quantic`), readable only by
 you, and used without asking Quantic while they're fresh: the calendar for 6 hours, holdings,
-dividends, income and a stock for 15 minutes, portfolios and searches for an hour. After that, the
+dividends, income and a stock for 15 minutes, portfolios, searches and upcoming dividends for an
+hour. After that, the
 CLI asks again with the answer's `ETag`, and an unchanged answer costs a `304` with no body.
 `auth status` always asks. When Quantic can't be reached, the last answer is used, whatever its age:
 
@@ -114,8 +137,8 @@ There are no releases yet (milestone 7), so the version is a Go pseudo-version n
 such as `v0.0.0-20261008113214-5820da20436c`.
 
 **Global flags:** `--json` (machine-readable output, a versioned contract), `--timeout` (default
-`10s`, for the whole call, retries included), `--portfolio <name>` (for `holdings`, `dividends` and
-`income`: one portfolio, by name or slug, in any case) and `--no-cache` (ask Quantic; don't read
+`10s`, for the whole call, retries included), `--portfolio <name>` (for `holdings`, `dividends`,
+`income`, `upcoming` and `status`: one portfolio, by name or slug, in any case) and `--no-cache` (ask Quantic; don't read
 or write the cache).
 
 **Environment:** `QUANTIC_URL` points the CLI at another Quantic, such as `http://localhost:4000`
@@ -130,7 +153,7 @@ for a local server (default `https://quantic.finance`); it has its own stored to
 | 1 | Failed, e.g. a symbol Quantic doesn't track |
 | 2 | Wrong usage: unknown command or flag, bad value, extra arguments, a portfolio you don't have |
 | 3 | Quantic unreachable, and nothing cached |
-| 4 | Not signed in, or the token was rejected (revoked, say) |
+| 4 | Not signed in, or the token was rejected (revoked, say); `status --json` still prints `"signed_in": false` |
 | 5 | Rate limited, after retrying |
 
 ## Working on this

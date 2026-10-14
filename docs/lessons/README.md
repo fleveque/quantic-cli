@@ -14,6 +14,7 @@ that turned out wrong, and the reasoning behind Go's choices where I found it no
 | [02](02-a-generated-client-and-the-network.md) | A generated client, and the network | 2 — the generated client | [A generated client, and the network](https://claude.ai/artifact/7kkCVCorLUBF6cjJFduzb5) | [The generated client, line by line](https://claude.ai/artifact/RZgW6D3BNvvxrqLVpW6jCZ) |
 | [03](03-a-token-the-keyring-and-your-own-data.md) | A token, the keyring, and your own data | 3 — signing in | [A token, the keyring, and your own data](https://claude.ai/artifact/AKBiEL9M7YYDTGskQD8md9) | [Signing in, line by line](https://claude.ai/artifact/2SYakbzwsUHAzUKasqxrre) |
 | [04](04-a-cache-that-keeps-the-bar-alive.md) | A cache that keeps the bar alive | 4 — the cache | [A cache that keeps the bar alive](https://claude.ai/artifact/8aYsD9oBMfykrCjLAb2FwZ) | [The cache, line by line](https://claude.ai/artifact/VaoAQndrkGKbrypASjjvZX) |
+| [05](05-three-calls-at-once.md) | Three calls at once | 5 — `upcoming` and `status` | [Three calls at once](https://claude.ai/artifact/LESSON05) | [Status, line by line](https://claude.ai/artifact/WALKTHROUGH05) |
 
 Lessons tell the story of a milestone: what surprised me and why. Walkthroughs go through the code
 itself in reading order, the way a tech lead would with a new teammate. Server milestones (S1, S2)

@@ -151,6 +151,17 @@ func (c *Client) Income(ctx context.Context, params GetIncomeParams) (*Income, e
 	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
 }
 
+// Upcoming is GET /api/v1/upcoming: the holdings, and the stocks on your
+// radar, going ex-dividend or paying in the next days, with what each should
+// pay. Quantic clamps days to 1–120. Needs a token.
+func (c *Client) Upcoming(ctx context.Context, params ListUpcomingParams) (*Upcoming, error) {
+	resp, err := c.gen.ListUpcomingWithResponse(ctx, &params)
+	if err != nil {
+		return nil, c.requestError(err)
+	}
+	return result(resp.JSON200, resp.HTTPResponse, resp.Body)
+}
+
 // StatusError is an answer from Quantic that isn't a 200: Status is the HTTP
 // status, Code the API's stable error code ("not_found", "rate_limited"…)
 // when the body had one, and Message what it said, for people.
