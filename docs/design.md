@@ -280,6 +280,10 @@ error to itself.
 An Omarchy shell plugin: a bar pill with a popup panel. It follows the pattern of the built-in
 Tailscale widget, which drives the `tailscale` CLI (`tailscale status --json`) from QML.
 
+**Built in milestone 6:** [fleveque/omarchy-quantic](https://github.com/fleveque/omarchy-quantic),
+plugin id `fleveque.quantic`, against Omarchy 4.0.0.alpha. The rest of this section is what was
+built; the changes from the first plan are marked.
+
 **It lives in its own repository**, not this one. `omarchy plugin add <git-url>` clones a repository
 and reads `manifest.json` at its root, so a plugin *is* a repository. The widget is also a different
 program: QML and JavaScript running inside Omarchy's shell, with no Go in it. What ties the two
@@ -291,21 +295,27 @@ CLI installed.
 omarchy-quantic/                 # its own repo; `omarchy plugin add <its git url>`
   manifest.json                  # kind: bar-widget (shape of omarchy.weather's)
   BarWidget.qml                  # the pill
-  Panel.qml                      # the popup
+  Panel.qml                      # the popup; runs quantic and holds the state
   Model.js                       # parsing and formatting, kept out of the QML
+  test/                          # node --test: Model.js against status fixtures
 ```
 
 **How it works.** A Quickshell `Process` runs `quantic status --json` on a `Timer` (every 10
 minutes by default, never under 5), and once when the panel opens. The QML parses the JSON and
-renders. All logic stays in the Go CLI; the widget stays thin.
+renders. All logic stays in the Go CLI; the widget stays thin. As in Omarchy's weather widget, the
+panel owns the state and the pill only draws it, so the two can't disagree. Days are counted from
+the widget's own today, not taken from `in_days`, so a copy cached yesterday still reads right.
 
 **The pill** shows one thing:
 - the next event: `MSFT ex-div tomorrow`;
-- or, with "show amounts" on, this month's income: `€42.10 / €118`;
+- with "show amounts" on, that event's amount too: `O ex-div in 3 days · $65.66`. *Changed:* the
+  plan was this month's income, `€42.10 / €118`, but received is one sum per currency (§8) and
+  projected is in your preferred one, so a single pair would leave most of it out;
 - dimmed when the data is stale, with a tooltip saying since when.
 
-**The panel:** the next 14 days of ex-dates and payments, this month received against projected,
-the last refresh time, and two actions: Refresh, and Open Quantic (`xdg-open`).
+**The panel:** the next event with its amount, this month received (per currency) against a
+typical month, the next 14 days of ex-dates and payments (radar stocks dimmed), the last refresh
+time, the parts that failed, and two actions: Refresh (`r`), and Open Quantic (`o`, `xdg-open`).
 
 **States the widget handles**, each from the CLI's exit code or `which quantic`, as the Tailscale
 widget does:
@@ -316,14 +326,21 @@ widget does:
 | Not signed in (exit 4) | icon with a key mark; the panel says `quantic auth login` |
 | Offline, cached (stale) | the cached text, dimmed |
 | Offline, nothing cached (exit 3) | icon only |
-| OK | the next event, or the month's income |
+| OK | the next event, with its amount if "show amounts" is on |
+| Output it can't read (another schema version) | icon, dimmed; the panel names the version |
 
 **Privacy.** A bar is visible when sharing your screen. Amounts are hidden in the pill by default;
 a setting ("show amounts in the bar") turns them on. The panel shows them, since opening it is
 deliberate.
 
-**Settings** (the plugin's settings form, like the weather widget's): refresh interval, portfolio,
-show amounts in the bar.
+**Settings** (the manifest's schema, set with `omarchy bar set fleveque.quantic <key> <value>`):
+`refreshMinutes`, `portfolio`, `showAmounts` (`Off`/`On`, as Omarchy's own widgets do a switch),
+and `command`, added because `go install` puts `quantic` in `~/go/bin`, which the Omarchy shell's
+`PATH` doesn't include. Packages (milestone 7) make that setting unnecessary for most people.
+
+**Tested:** `Model.js` with `node --test` against a copy of this repository's golden
+`status.json`, which the widget's CI compares with this one's; the QML by hand in a live shell,
+with a fake `quantic` that prints fixtures and chosen exit codes.
 
 ---
 
@@ -378,8 +395,8 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | 3 | `auth` with keyring; `holdings`, `portfolios`, `dividends`, `income`. **Done** (#8, [ADR 0003](decisions/0003-where-the-token-lives.md)) | interfaces for secrets, OS integration |
 | 4 | Cache: freshness, ETags, offline, locks. **Done** (#9, [ADR 0004](decisions/0004-the-cache-is-a-transport.md)) | files, `encoding/json`, `flock`, time |
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts, and the same in MCP, AI chat, Telegram and the iCal feed. **Done** (#496, #497) | — |
-| 5 | `upcoming` and `status`, concurrently. **In review** | goroutines, `sync.WaitGroup`, partial failure |
-| 6 | The Omarchy widget, in its own repo | (QML, not Go; consuming your own JSON contract) |
+| 5 | `upcoming` and `status`, concurrently. **Done** (#10) | goroutines, `sync.WaitGroup`, partial failure |
+| 6 | The Omarchy widget, in its own repo ([omarchy-quantic](https://github.com/fleveque/omarchy-quantic)). **In review** | (QML, not Go; consuming your own JSON contract) |
 | 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew | build flags, cross-compilation, checksums |
 | 8 | `quantic dash`: terminal dashboard | Bubble Tea (Elm architecture) |
 | 9 | Browser login: OAuth 2.1, PKCE, loopback redirect | `net/http` server, `crypto/rand`, OAuth |

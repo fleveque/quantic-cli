@@ -3,11 +3,13 @@
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal, and in scripts and status bars through `--json`.
 
-> **Status: milestone 5 of 9.** Sign in with a personal API token, then read your own
+> **Status: milestone 6 of 9.** Sign in with a personal API token, then read your own
 > `portfolios`, `holdings`, `dividends`, `income` and `upcoming` dividends, or all at a glance with
 > `status`. The public commands (`calendar`, `stock`, `search`) work signed out too. Answers are
-> cached, and when Quantic can't be reached the last one is shown, marked stale. The Omarchy bar
-> widget, which reads `quantic status --json`, comes in milestone 6. The API it reads is
+> cached, and when Quantic can't be reached the last one is shown, marked stale. On
+> [Omarchy](https://omarchy.org), [omarchy-quantic](https://github.com/fleveque/omarchy-quantic)
+> puts your next dividend in the bar, from `quantic status --json`. Releases and packages come in
+> milestone 7. The API it reads is
 > documented at [quantic.finance/developers](https://quantic.finance/developers). Start with the
 > [design](docs/design.md).
 
@@ -102,6 +104,10 @@ EX-DATE     PAY DATE    SYMBOL  NAME               SHARES   PER SHARE    EXPECTE
 2026-10-19  2026-12-10  MSFT    Microsoft           radar  0.9652 USD           -           -  -
 ...
 ```
+
+**In the Omarchy bar:** [omarchy-quantic](https://github.com/fleveque/omarchy-quantic) shows
+your next ex-date or payment as a pill, with the next 14 days in a panel. It runs `quantic status
+--json`, so install and sign in to the CLI first.
 
 `upcoming` lists stocks on your radar too (`radar`, with no amounts); `--portfolio` leaves them
 out. `status` makes its three calls to Quantic at once. If one fails, it shows the rest, lists

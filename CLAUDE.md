@@ -21,9 +21,13 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   per entry.
 - Milestone S2 is done in `../quantic` (#496, #497): `/api/v1/upcoming`, and the same data in MCP,
   AI chat, Telegram and the iCal feed.
-- Milestone 5 (in review): `upcoming`, and `status`, three calls at once with partial failure
-  (design §8); lesson 05 and walkthrough 05. Next is milestone 6, the Omarchy widget in its own
-  repository, when the author says.
+- Milestone 5 is done (#10): `upcoming`, and `status`, three calls at once with partial failure
+  (design §8).
+- Milestone 6 (in review): the Omarchy widget in its own repository,
+  [fleveque/omarchy-quantic](https://github.com/fleveque/omarchy-quantic) (`../omarchy-quantic`):
+  QML and a node-tested `Model.js` over `quantic.cli/status/v1`; its CI fails when this repo's
+  golden `status.json` changes, so a change to that file means a widget PR too. Lesson 06 here; no
+  walkthrough, as there's no Go. Next is milestone 7, the release, when the author says.
 
 ## Conventions
 
