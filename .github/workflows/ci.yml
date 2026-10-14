@@ -75,6 +75,30 @@ jobs:
         if: hashFiles('go.mod') != ''
         run: go test -race ./...
 
+      # The release, built but not published: every platform, the archives,
+      # the AUR package and the Homebrew cask, so a change that would break
+      # the next release fails here instead of on the tag.
+      - name: Release builds
+        if: hashFiles('.goreleaser.yaml') != ''
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.18.2
+          args: release --snapshot --clean
+        env:
+          AUR_KEY: unused-in-a-snapshot
+          HOMEBREW_TAP_TOKEN: unused-in-a-snapshot
+
+      # The -X flags reached main's variables: a release says its version,
+      # not a pseudo-version or "(devel)".
+      - name: Release binary knows its version
+        if: hashFiles('.goreleaser.yaml') != ''
+        run: |
+          got="$(dist/quantic_linux_amd64_v1/quantic version --json | jq -r .version)"
+          want="$(jq -r .version dist/metadata.json)"
+          echo "binary: $got, release: $want"
+          [ "$got" = "$want" ]
+
   docs:
     name: docs
     runs-on: ubuntu-latest

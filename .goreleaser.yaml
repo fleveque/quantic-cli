@@ -1,0 +1,124 @@
+# How a release is made (ADR 0005): `git tag vX.Y.Z && git push --tags` runs
+# .github/workflows/release.yml, which runs GoReleaser with this file. It
+# builds every platform, archives each with the completion scripts, writes
+# checksums, publishes a GitHub release, and updates the AUR package and the
+# Homebrew tap. `goreleaser release --snapshot --clean` builds it all locally
+# without publishing anything.
+version: 2
+
+project_name: quantic-cli
+
+before:
+  hooks:
+    # The shell completion scripts the packages install, written by the CLI
+    # itself (Cobra's `completion` command), so they can't drift from it.
+    - sh -c 'mkdir -p completions && for s in bash zsh fish; do go run ./cmd/quantic completion "$s" > "completions/quantic.$s"; done'
+
+builds:
+  - id: quantic
+    main: ./cmd/quantic
+    binary: quantic
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags:
+      - -trimpath
+    # main.version, main.commit and main.date (cmd/quantic/main.go). The
+    # commit's date, not the build's, and the commit's time on every file:
+    # the same tag builds the same bytes.
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -X main.commit={{ .ShortCommit }} -X main.date={{ .CommitDate }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: quantic
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "quantic_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    # Every file at the commit's time, owned by root rather than whoever
+    # built it, so the archives, and the checksums the packages pin, are the
+    # same each time and on any machine a tag is built.
+    builds_info:
+      owner: root
+      group: root
+      mtime: "{{ .CommitDate }}"
+    files:
+      - src: README.md
+        info: &commit_time
+          owner: root
+          group: root
+          mtime: "{{ .CommitDate }}"
+      - src: LICENSE
+        info: *commit_time
+      - src: completions/*
+        info: *commit_time
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github-native
+
+release:
+  github:
+    owner: fleveque
+    name: quantic-cli
+
+# Arch, and so Omarchy: the prebuilt binary, as AUR packages named -bin are.
+# Needs the AUR_KEY secret, the private SSH key of the AUR account that owns
+# quantic-cli-bin.
+aurs:
+  - name: quantic-cli-bin
+    ids: [quantic]
+    homepage: https://github.com/fleveque/quantic-cli
+    description: A read-only command-line client for Quantic Finance, with JSON for scripts and status bars
+    maintainers:
+      - "Francesc Leveque <568487+fleveque@users.noreply.github.com>"
+    license: MIT
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: ssh://aur@aur.archlinux.org/quantic-cli-bin.git
+    provides: [quantic-cli]
+    conflicts: [quantic-cli]
+    commit_author:
+      name: Francesc Leveque
+      email: 568487+fleveque@users.noreply.github.com
+    package: |-
+      install -Dm755 ./quantic "${pkgdir}/usr/bin/quantic"
+      install -Dm644 ./LICENSE "${pkgdir}/usr/share/licenses/quantic-cli-bin/LICENSE"
+      install -Dm644 ./completions/quantic.bash "${pkgdir}/usr/share/bash-completion/completions/quantic"
+      install -Dm644 ./completions/quantic.zsh "${pkgdir}/usr/share/zsh/site-functions/_quantic"
+      install -Dm644 ./completions/quantic.fish "${pkgdir}/usr/share/fish/vendor_completions.d/quantic.fish"
+
+# macOS and Linux with Homebrew: a cask in fleveque/homebrew-tap, so
+# `brew install fleveque/tap/quantic`. Needs the HOMEBREW_TAP_TOKEN secret, a
+# token that can push to that repository.
+homebrew_casks:
+  - name: quantic
+    ids: [quantic]
+    homepage: https://github.com/fleveque/quantic-cli
+    # Homebrew's style: no leading article.
+    description: Read-only command-line client for Quantic Finance
+    license: MIT
+    binaries: [quantic]
+    completions:
+      bash: completions/quantic.bash
+      zsh: completions/quantic.zsh
+      fish: completions/quantic.fish
+    repository:
+      owner: fleveque
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    commit_author:
+      name: Francesc Leveque
+      email: 568487+fleveque@users.noreply.github.com
+    # The binaries aren't signed by Apple, so macOS would refuse to run one
+    # downloaded by Homebrew. The quarantine flag is what it checks.
+    hooks:
+      post:
+        install: |
+          if OS.mac? && system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/quantic"]
+          end

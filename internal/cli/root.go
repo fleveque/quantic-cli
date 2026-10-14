@@ -133,9 +133,9 @@ Environment:
 	// apply the default distance: without this it suggests nothing.
 	root.SuggestionsMinimumDistance = 2
 
-	// Not now: a `completion` command appears with the release (milestone 7),
-	// when there's somewhere to install the scripts it writes.
-	root.CompletionOptions.DisableDefaultCmd = true
+	// Cobra's own `completion` command writes the shell scripts. The packages
+	// (milestone 7) run it at release time and install what it writes, so
+	// tab completion works without anyone running it by hand.
 
 	// Cobra calls this for any flag it can't parse, on any command.
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error {

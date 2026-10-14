@@ -23,11 +23,15 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   AI chat, Telegram and the iCal feed.
 - Milestone 5 is done (#10): `upcoming`, and `status`, three calls at once with partial failure
   (design §8).
-- Milestone 6 (in review): the Omarchy widget in its own repository,
+- Milestone 6 is done (omarchy-quantic#1, #11): the Omarchy widget in its own repository,
   [fleveque/omarchy-quantic](https://github.com/fleveque/omarchy-quantic) (`../omarchy-quantic`):
   QML and a node-tested `Model.js` over `quantic.cli/status/v1`; its CI fails when this repo's
-  golden `status.json` changes, so a change to that file means a widget PR too. Lesson 06 here; no
-  walkthrough, as there's no Go. Next is milestone 7, the release, when the author says.
+  golden `status.json` changes, so a change to that file means a widget PR too.
+- Milestone 7 (in review): releases (ADR 0005): a `v*` tag runs GoReleaser: six platforms,
+  reproducible archives, the AUR package `quantic-cli-bin`, a cask in `fleveque/homebrew-tap`, and
+  Cobra's `completion`. The author adds the `AUR_KEY` and `HOMEBREW_TAP_TOKEN` secrets and pushes
+  the tags; never push a tag. Lesson 07 and walkthrough 07. Next is milestone 8, `quantic dash`,
+  when the author says.
 
 ## Conventions
 

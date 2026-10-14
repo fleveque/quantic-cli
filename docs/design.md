@@ -336,7 +336,8 @@ deliberate.
 **Settings** (the manifest's schema, set with `omarchy bar set fleveque.quantic <key> <value>`):
 `refreshMinutes`, `portfolio`, `showAmounts` (`Off`/`On`, as Omarchy's own widgets do a switch),
 and `command`, added because `go install` puts `quantic` in `~/go/bin`, which the Omarchy shell's
-`PATH` doesn't include. Packages (milestone 7) make that setting unnecessary for most people.
+`PATH` doesn't include. The packages (milestone 7) install `/usr/bin/quantic`, which it does, so
+the setting is only needed after `go install`.
 
 **Tested:** `Model.js` with `node --test` against a copy of this repository's golden
 `status.json`, which the widget's CI compares with this one's; the QML by hand in a live shell,
@@ -347,6 +348,7 @@ with a fake `quantic` that prints fixtures and chosen exit codes.
 ## 10. Code layout
 
 ```
+.goreleaser.yaml        how a release is built and published (ADR 0005)
 api/openapi.json        a copy of Quantic's OpenAPI document (ADR 0002)
 cmd/quantic/            main: wiring only
 internal/cli/           Cobra commands, flags, exit codes; status.go composes `quantic status`
@@ -396,8 +398,8 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | 4 | Cache: freshness, ETags, offline, locks. **Done** (#9, [ADR 0004](decisions/0004-the-cache-is-a-transport.md)) | files, `encoding/json`, `flock`, time |
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts, and the same in MCP, AI chat, Telegram and the iCal feed. **Done** (#496, #497) | — |
 | 5 | `upcoming` and `status`, concurrently. **Done** (#10) | goroutines, `sync.WaitGroup`, partial failure |
-| 6 | The Omarchy widget, in its own repo ([omarchy-quantic](https://github.com/fleveque/omarchy-quantic)). **In review** | (QML, not Go; consuming your own JSON contract) |
-| 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew | build flags, cross-compilation, checksums |
+| 6 | The Omarchy widget, in its own repo ([omarchy-quantic](https://github.com/fleveque/omarchy-quantic)). **Done** (omarchy-quantic#1, #11) | (QML, not Go; consuming your own JSON contract) |
+| 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew. **In review** ([ADR 0005](decisions/0005-releases-with-goreleaser.md)) | build flags, cross-compilation, checksums |
 | 8 | `quantic dash`: terminal dashboard | Bubble Tea (Elm architecture) |
 | 9 | Browser login: OAuth 2.1, PKCE, loopback redirect | `net/http` server, `crypto/rand`, OAuth |
 
@@ -410,6 +412,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
    clients? Needed for milestone 9; until then, tokens.
 3. ~~Where the widget lives.~~ Its own repository: `omarchy plugin add` reads `manifest.json` at a
    repository's root (section 9). Its name is still open (`omarchy-quantic`?).
-4. **The binary's name:** `quantic` is short; check for clashes in the AUR and Homebrew.
+4. ~~The binary's name.~~ `quantic` is free in the AUR, Arch and Homebrew (checked 2026-10-14):
+   [ADR 0005](decisions/0005-releases-with-goreleaser.md).
 5. **Reusing Go code from the agent's Go version** (quantic-agent-go: the MCP client, backoff): copy
    what's useful. That repository is archived and the agent is now Python, so there's no module to share.
