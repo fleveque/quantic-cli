@@ -117,9 +117,9 @@ func runStatus(cmd *cobra.Command, opts *Options) error {
 	var dividends statusPart[api.DividendList]
 
 	// Three calls at once, each its own goroutine writing only its own part.
-	// Not errgroup: its first error cancels the others, and here one part
-	// failing must not take the others with it. wg.Wait is what makes the
-	// parts safe to read afterwards.
+	// Not errgroup: with WithContext its first error cancels the others, and
+	// here one part failing must not take the others with it. wg.Wait is
+	// what makes the parts safe to read afterwards.
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		days := statusDays
@@ -232,9 +232,9 @@ func civilDate(t time.Time) time.Time {
 // nextEvent is your holdings' first ex-date or payment from today on. Items
 // come soonest first, but an item's ex-date can be past while its payment
 // is to come, so every date is looked at. The radar has no dividend of
-// yours, so it's left out. On the same day an ex-date comes before a
-// payment, and otherwise the item that came first. A stock held in several
-// portfolios is one event: what they pay together, with no portfolio.
+// yours, so it's left out. Two on the same day: the first in Quantic's
+// order. A stock held in several portfolios is one event: what they pay
+// together, with no portfolio.
 func nextEvent(items []upcomingItem, today time.Time) *statusEvent {
 	var next *statusEvent
 	for _, it := range items {
