@@ -7,8 +7,8 @@ all built by GoReleaser from one file. Very little of this is new Go code. It's 
 binary already is (one static file, cross-compiled anywhere), what the linker can write into it,
 and what it takes for two builds of the same commit to come out byte for byte the same.
 
-*Also readable as a [formatted page](https://claude.ai/artifact/LESSON07). The code, file by file:
-[walkthrough](https://claude.ai/artifact/WALKTHROUGH07).*
+*Also readable as a [formatted page](https://claude.ai/artifact/KFpakZA3KQHZu5cV8pDgfq). The code, file by file:
+[walkthrough](https://claude.ai/artifact/9ZCcg66Ja5iLtYb394q2jw).*
 
 ---
 
