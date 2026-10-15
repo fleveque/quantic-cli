@@ -8,8 +8,9 @@ income in the terminal, and in scripts and status bars through `--json`.
 > `status`. The public commands (`calendar`, `stock`, `search`) work signed out too. Answers are
 > cached, and when Quantic can't be reached the last one is shown, marked stale. On
 > [Omarchy](https://omarchy.org), [omarchy-quantic](https://github.com/fleveque/omarchy-quantic)
-> puts your next dividend in the bar, from `quantic status --json`. Releases come with packages
-> for Arch (and Omarchy) and Homebrew. The API it reads is
+> puts your next dividend in the bar, from `quantic status --json`. Releases come with archives for
+> six platforms and a Homebrew package; the Arch (and Omarchy) package waits for the AUR to accept
+> new accounts again. The API it reads is
 > documented at [quantic.finance/developers](https://quantic.finance/developers). Start with the
 > [design](docs/design.md).
 
@@ -35,16 +36,16 @@ with a [lesson](docs/lessons/README.md) and a line-by-line code walkthrough for 
 
 | Where | How |
 |---|---|
-| Arch, Omarchy | `yay -S quantic-cli-bin` (the AUR) |
+| Arch, Omarchy | `yay -S quantic-cli-bin` (the AUR), once it's published: the AUR has accepted no new accounts since August 2026. Until then, an archive or `go install` |
 | macOS, Linux with Homebrew | `brew install fleveque/tap/quantic` |
 | Anywhere else | an archive for Linux, macOS or Windows (amd64, arm64) from [Releases](https://github.com/fleveque/quantic-cli/releases), checked against its `checksums.txt` |
 | With Go 1.27 or later | `go install github.com/fleveque/quantic-cli/cmd/quantic@latest` |
 
-The packages exist from the first release, v0.1.0; before it, `go install` is the way. They
-install the binary, and the tab completion for bash, zsh and fish (`quantic completion <shell>`
+The Homebrew package and the archives exist from the first release, v0.1.0; before it,
+`go install` is the way. The packages install the binary, and the tab completion for bash, zsh and fish (`quantic completion <shell>`
 prints them for anything else). `go install` puts `quantic` in `~/go/bin`, which the
 [Omarchy widget](https://github.com/fleveque/omarchy-quantic) doesn't look in: it needs its
-`command` setting.
+`command` setting, as it does for a binary unpacked from an archive anywhere off its `PATH`.
 
 ## Try it
 
@@ -191,8 +192,10 @@ review their diff like code.
 
 **Releases** ([ADR 0005](docs/decisions/0005-releases-with-goreleaser.md)) are made by pushing a
 tag (`git tag v0.1.0 && git push origin v0.1.0`) from `main`. `.github/workflows/release.yml` runs
-GoReleaser, which builds every platform, publishes the GitHub release, and updates the AUR package
-and the Homebrew tap. It needs two repository secrets: `AUR_KEY` and `HOMEBREW_TAP_TOKEN`.
+GoReleaser, which builds every platform, publishes the GitHub release, and updates the Homebrew tap
+and the AUR package. The tap needs the repository secret `HOMEBREW_TAP_TOKEN`. The AUR needs
+`AUR_KEY`, and without it the package is built but not pushed: the AUR isn't accepting new
+accounts, so there is no key yet. Adding the secret turns the AUR on, with no code change.
 `goreleaser release --snapshot --clean` builds the whole release locally, into `dist/`, without
 publishing anything, and CI does the same on every PR.
 

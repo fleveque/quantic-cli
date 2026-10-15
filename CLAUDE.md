@@ -27,11 +27,11 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   [fleveque/omarchy-quantic](https://github.com/fleveque/omarchy-quantic) (`../omarchy-quantic`):
   QML and a node-tested `Model.js` over `quantic.cli/status/v1`; its CI fails when this repo's
   golden `status.json` changes, so a change to that file means a widget PR too.
-- Milestone 7 (in review): releases (ADR 0005): a `v*` tag runs GoReleaser: six platforms,
+- Milestone 7 is done (#12): releases (ADR 0005): a `v*` tag runs GoReleaser: six platforms,
   reproducible archives, the AUR package `quantic-cli-bin`, a cask in `fleveque/homebrew-tap`, and
-  Cobra's `completion`. The author adds the `AUR_KEY` and `HOMEBREW_TAP_TOKEN` secrets and pushes
-  the tags; never push a tag. Lesson 07 and walkthrough 07. Next is milestone 8, `quantic dash`,
-  when the author says.
+  Cobra's `completion`. The AUR takes no new accounts (since 2026-08), so its push is skipped until
+  the `AUR_KEY` secret exists. The author adds the secrets and pushes the tags; never push a tag.
+  Lesson 07 and walkthrough 07. Next is milestone 8, `quantic dash`, when the author says.
 
 ## Conventions
 
