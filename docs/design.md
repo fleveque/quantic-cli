@@ -336,8 +336,9 @@ deliberate.
 **Settings** (the manifest's schema, set with `omarchy bar set fleveque.quantic <key> <value>`):
 `refreshMinutes`, `portfolio`, `showAmounts` (`Off`/`On`, as Omarchy's own widgets do a switch),
 and `command`, added because `go install` puts `quantic` in `~/go/bin`, which the Omarchy shell's
-`PATH` doesn't include. The packages (milestone 7) install `/usr/bin/quantic`, which it does, so
-the setting is only needed after `go install`.
+`PATH` doesn't include. The AUR package (milestone 7) installs `/usr/bin/quantic`, which it does,
+so the setting is only needed after `go install` or an archive. Until that package can be
+published (ADR 0005), that's every Arch install.
 
 **Tested:** `Model.js` with `node --test` against a copy of this repository's golden
 `status.json`, which the widget's CI compares with this one's; the QML by hand in a live shell,
@@ -399,7 +400,7 @@ Each ships code and, as in quantic-agent, a lesson and a walkthrough. The Go eac
 | S2 | **Quantic (Elixir):** `/api/v1/upcoming` with pay dates and amounts, and the same in MCP, AI chat, Telegram and the iCal feed. **Done** (#496, #497) | — |
 | 5 | `upcoming` and `status`, concurrently. **Done** (#10) | goroutines, `sync.WaitGroup`, partial failure |
 | 6 | The Omarchy widget, in its own repo ([omarchy-quantic](https://github.com/fleveque/omarchy-quantic)). **Done** (omarchy-quantic#1, #11) | (QML, not Go; consuming your own JSON contract) |
-| 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew. **In review** ([ADR 0005](decisions/0005-releases-with-goreleaser.md)) | build flags, cross-compilation, checksums |
+| 7 | Release: GoReleaser, an AUR package (Omarchy is Arch), Homebrew. **Done** (#12, [ADR 0005](decisions/0005-releases-with-goreleaser.md)); the AUR push waits for an account, as the AUR takes no new ones | build flags, cross-compilation, checksums |
 | 8 | `quantic dash`: terminal dashboard | Bubble Tea (Elm architecture) |
 | 9 | Browser login: OAuth 2.1, PKCE, loopback redirect | `net/http` server, `crypto/rand`, OAuth |
 

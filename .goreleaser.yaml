@@ -70,9 +70,12 @@ release:
 
 # Arch, and so Omarchy: the prebuilt binary, as AUR packages named -bin are.
 # Needs the AUR_KEY secret, the private SSH key of the AUR account that owns
-# quantic-cli-bin.
+# quantic-cli-bin. The AUR has closed new accounts since August 2026 (ADR
+# 0005), so until there is one the secret is missing: the package is still
+# built, and only the push is skipped. Adding the secret turns it on.
 aurs:
   - name: quantic-cli-bin
+    skip_upload: '{{ if isEnvSet "AUR_KEY" }}false{{ else }}true{{ end }}'
     ids: [quantic]
     homepage: https://github.com/fleveque/quantic-cli
     description: A read-only command-line client for Quantic Finance, with JSON for scripts and status bars

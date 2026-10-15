@@ -179,6 +179,22 @@ package managers. So the author decides when.
 | the help check reading the wrong command's output | `help.txtar`'s first version passed whatever happened; it now runs `quantic --help` first, and fails when that's swapped for `quantic version` |
 | archive files at build time and owner | two snapshot builds give different checksums (checked by hand, not in CI: it would double the build) |
 
+## After the merge: the AUR was closed
+
+When I went to make the AUR account, the register page didn't work: the AUR has taken no new
+accounts since August 2026, after a wave of malicious packages. Without a key the release would
+have published to GitHub and then failed at the AUR step. So the AUR step now asks first:
+
+```yaml
+skip_upload: '{{ if isEnvSet "AUR_KEY" }}false{{ else }}true{{ end }}'
+```
+
+GoReleaser's `isEnvSet` is false for an empty variable, and a missing secret reaches the job as an
+empty string. The PKGBUILD is still built on every release and checked by CI; only the push waits.
+Adding the secret, once there's an account, turns it on. Checked with snapshot builds:
+`dist/artifacts.json` records `skip_upload` as `true` with `AUR_KEY` empty or unset, and `false`
+with it set ([ADR 0005](../decisions/0005-releases-with-goreleaser.md), updated).
+
 ## What I'm taking away
 
 - Cross-compiling Go is two environment variables, if nothing has pulled in C. Keeping cgo off in
@@ -190,5 +206,7 @@ package managers. So the author decides when.
 - Install where things are looked for: `/usr/bin`, and each shell's completion directory.
 - The last step publishes under someone's name, so it belongs to them. Everything before it can be
   checked on every PR.
+- A step that depends on something outside the repository should be able to wait for it without
+  blocking the rest.
 
 Next: milestone 8, `quantic dash`, a terminal dashboard with Bubble Tea.

@@ -55,11 +55,26 @@ called `quantic` or `quantic-cli` (checked 2026-10-14). That closes design open 
 
 - Installing on Arch and Omarchy is `yay -S quantic-cli-bin`, and the binary is on the `PATH`
   Omarchy's shell has. The widget's `command` setting is then only for unusual installs.
-- The author holds two credentials that a release needs. Without them, the tag's run fails at the
-  AUR or Homebrew step, after the GitHub release is already published. Re-running the job finishes
-  it.
+- The author holds two credentials that a release needs. Without the Homebrew token, the tag's run
+  fails at that step, after the GitHub release is already published. Re-running the job finishes
+  it. Without the AUR key, the AUR step is skipped (see the update below).
 - The tap's `main` isn't protected: each release pushes its cask there directly.
 - `go install …@latest` keeps working, and now reports the tag's version instead of a
   pseudo-version.
 - A change that breaks a platform, the archives or a package fails CI on the PR, not on the next
   tag.
+
+## Update, 2026-10-15: the AUR has no account to publish with
+
+The AUR closed new-account registration in August 2026, after a wave of malicious packages, and it
+was still closed when the author tried to register after this ADR was merged. Existing accounts can
+publish; there is no way to get one.
+
+So the AUR step depends on the secret: `skip_upload` is true unless `AUR_KEY` is set and not empty
+(GoReleaser's `isEnvSet`; a missing secret reaches the job as an empty string). Every release still
+builds the PKGBUILD, and CI still checks it, so nothing about the package goes stale. Only the push
+is skipped. v0.1.0 ships with the GitHub release and the Homebrew cask. On Arch and Omarchy, until
+the AUR reopens, it's an archive or `go install`, and the widget's `command` setting.
+
+When an account exists, adding the `AUR_KEY` secret publishes `quantic-cli-bin` on the next tag,
+with no code change.
