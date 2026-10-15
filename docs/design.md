@@ -281,7 +281,9 @@ An Omarchy shell plugin: a bar pill with a popup panel. It follows the pattern o
 Tailscale widget, which drives the `tailscale` CLI (`tailscale status --json`) from QML.
 
 **Built in milestone 6:** [fleveque/omarchy-quantic](https://github.com/fleveque/omarchy-quantic),
-plugin id `fleveque.quantic`, against Omarchy 4.0.0.alpha. The rest of this section is what was
+plugin id `io.github.fleveque.quantic` (`fleveque.quantic` until 2026-10-15: renamed before listing on
+plugins.omarchy.org, which asks for a namespaced ID and keeps it forever), against Omarchy
+4.0.0.alpha. The rest of this section is what was
 built; the changes from the first plan are marked.
 
 **It lives in its own repository**, not this one. `omarchy plugin add <git-url>` clones a repository
@@ -333,12 +335,13 @@ widget does:
 a setting ("show amounts in the bar") turns them on. The panel shows them, since opening it is
 deliberate.
 
-**Settings** (the manifest's schema, set with `omarchy bar set fleveque.quantic <key> <value>`):
+**Settings** (the manifest's schema, set with `omarchy bar set io.github.fleveque.quantic <key> <value>`):
 `refreshMinutes`, `portfolio`, `showAmounts` (`Off`/`On`, as Omarchy's own widgets do a switch),
 and `command`, added because `go install` puts `quantic` in `~/go/bin`, which the Omarchy shell's
-`PATH` doesn't include. The AUR package (milestone 7) installs `/usr/bin/quantic`, which it does,
-so the setting is only needed after `go install` or an archive. Until that package can be
-published (ADR 0005), that's every Arch install.
+`PATH` doesn't include. `~/.local/bin` is on it (Omarchy's session adds it), so the widget's README
+installs the release archive there, or `GOBIN=~/.local/bin go install`; the AUR package
+(milestone 7) will install `/usr/bin/quantic`, once it can be published (ADR 0005). The setting is
+for anywhere else.
 
 **Tested:** `Model.js` with `node --test` against a copy of this repository's golden
 `status.json`, which the widget's CI compares with this one's; the QML by hand in a live shell,
