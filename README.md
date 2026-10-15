@@ -44,8 +44,9 @@ with a [lesson](docs/lessons/README.md) and a line-by-line code walkthrough for 
 The Homebrew package and the archives exist from the first release, v0.1.0; before it,
 `go install` is the way. The packages install the binary, and the tab completion for bash, zsh and fish (`quantic completion <shell>`
 prints them for anything else). `go install` puts `quantic` in `~/go/bin`, which the
-[Omarchy widget](https://github.com/fleveque/omarchy-quantic) doesn't look in: it needs its
-`command` setting, as it does for a binary unpacked from an archive anywhere off its `PATH`.
+[Omarchy widget](https://github.com/fleveque/omarchy-quantic) doesn't look in. On Omarchy, put it in
+`~/.local/bin`, which the widget does: unpack the archive there, or
+`GOBIN=~/.local/bin go install …`. Anywhere else, the widget needs its `command` setting.
 
 ## Try it
 

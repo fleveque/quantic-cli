@@ -9,6 +9,10 @@ out what the contract needed.
 *Also readable as a [formatted page](https://claude.ai/artifact/2DyPcTgPY5PeZsMaDVVwGH). No walkthrough this
 time: the walkthroughs are for Go code, and this milestone has none.*
 
+*The plugin ID was `fleveque.quantic` when this was written. Since 2026-10-15 it's
+`io.github.fleveque.quantic`, the namespaced form plugins.omarchy.org asks for, and the commands
+below use it.*
+
 ---
 
 ## What landed
@@ -129,7 +133,7 @@ $ tr '\0' '\n' < /proc/$(pgrep -f quickshell | head -1)/environ | grep ^PATH= | 
 ```
 
 So the widget said "not installed" for a CLI I had just installed. It now has a `command` setting
-(`omarchy bar set fleveque.quantic command ~/go/bin/quantic`), and it expands `~/` itself, because
+(`omarchy bar set io.github.fleveque.quantic command ~/go/bin/quantic`), and it expands `~/` itself, because
 `Process` runs a command with no shell to do it. When milestone 7 packages the CLI into `/usr/bin`,
 most people won't need the setting.
 
@@ -160,7 +164,7 @@ prints one of the fixtures and exits with a code read from a file. The widget's 
 pointed at it. Changing the file and asking for a refresh went through every state:
 
 ```
-omarchy-shell fleveque.quantic refresh
+omarchy-shell io.github.fleveque.quantic refresh
 ```
 
 ![signed out](https://raw.githubusercontent.com/fleveque/omarchy-quantic/main/docs/screenshots/pill-signed-out.png)
