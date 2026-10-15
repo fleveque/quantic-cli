@@ -3,13 +3,13 @@
 A command-line client for [Quantic Finance](https://quantic.finance): your portfolio, dividends and
 income in the terminal, and in scripts and status bars through `--json`.
 
-> **Status: milestone 6 of 9.** Sign in with a personal API token, then read your own
+> **Status: milestone 7 of 9.** Sign in with a personal API token, then read your own
 > `portfolios`, `holdings`, `dividends`, `income` and `upcoming` dividends, or all at a glance with
 > `status`. The public commands (`calendar`, `stock`, `search`) work signed out too. Answers are
 > cached, and when Quantic can't be reached the last one is shown, marked stale. On
 > [Omarchy](https://omarchy.org), [omarchy-quantic](https://github.com/fleveque/omarchy-quantic)
-> puts your next dividend in the bar, from `quantic status --json`. Releases and packages come in
-> milestone 7. The API it reads is
+> puts your next dividend in the bar, from `quantic status --json`. Releases come with packages
+> for Arch (and Omarchy) and Homebrew. The API it reads is
 > documented at [quantic.finance/developers](https://quantic.finance/developers). Start with the
 > [design](docs/design.md).
 
@@ -31,12 +31,24 @@ one static binary per platform, cross-compiled from one machine, with mature lib
 keyrings, releases and terminal interfaces. It's also how I'm learning Go, milestone by milestone,
 with a [lesson](docs/lessons/README.md) and a line-by-line code walkthrough for each.
 
+## Install
+
+| Where | How |
+|---|---|
+| Arch, Omarchy | `yay -S quantic-cli-bin` (the AUR) |
+| macOS, Linux with Homebrew | `brew install fleveque/tap/quantic` |
+| Anywhere else | an archive for Linux, macOS or Windows (amd64, arm64) from [Releases](https://github.com/fleveque/quantic-cli/releases), checked against its `checksums.txt` |
+| With Go 1.27 or later | `go install github.com/fleveque/quantic-cli/cmd/quantic@latest` |
+
+The packages exist from the first release, v0.1.0; before it, `go install` is the way. They
+install the binary, and the tab completion for bash, zsh and fish (`quantic completion <shell>`
+prints them for anything else). `go install` puts `quantic` in `~/go/bin`, which the
+[Omarchy widget](https://github.com/fleveque/omarchy-quantic) doesn't look in: it needs its
+`command` setting.
+
 ## Try it
 
-With Go 1.27 or later:
-
 ```
-go install github.com/fleveque/quantic-cli/cmd/quantic@latest
 quantic calendar --days 14   # stocks going ex-dividend in the next two weeks
 quantic stock KO             # price, dividend, safety and scores
 quantic search coca          # find a symbol by ticker or name
@@ -139,7 +151,8 @@ showing the last known state. `--no-cache` asks Quantic and leaves the cache alo
 `quantic cache clear` and `quantic auth logout` empty it. Two commands asking for the same thing at
 once (the bar, and you in a terminal) make one request: the second waits for the first's answer.
 
-There are no releases yet (milestone 7), so the version is a Go pseudo-version naming the commit,
+`quantic version` says which release you have, its commit and the commit's date. A build from a
+commit between releases, with `go install`, reports a Go pseudo-version naming the commit instead,
 such as `v0.0.0-20261008113214-5820da20436c`.
 
 **Global flags:** `--json` (machine-readable output, a versioned contract), `--timeout` (default
@@ -175,6 +188,13 @@ go test -race ./...   # unit tests, plus testscript runs of the real binary
 
 `go test ./internal/cli -update` rewrites the golden files after an intended change to the output;
 review their diff like code.
+
+**Releases** ([ADR 0005](docs/decisions/0005-releases-with-goreleaser.md)) are made by pushing a
+tag (`git tag v0.1.0 && git push origin v0.1.0`) from `main`. `.github/workflows/release.yml` runs
+GoReleaser, which builds every platform, publishes the GitHub release, and updates the AUR package
+and the Homebrew tap. It needs two repository secrets: `AUR_KEY` and `HOMEBREW_TAP_TOKEN`.
+`goreleaser release --snapshot --clean` builds the whole release locally, into `dist/`, without
+publishing anything, and CI does the same on every PR.
 
 The API client in `internal/api/api.gen.go` is generated from `api/openapi.json`, a copy of
 Quantic's OpenAPI document ([ADR 0002](docs/decisions/0002-generated-client-from-a-checked-in-spec.md)).

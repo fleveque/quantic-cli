@@ -12,5 +12,13 @@ stdout '--timeout duration +give up on Quantic after this long \(default 10s\)'
 exits 0 quantic help version
 stdout 'quantic version \[flags\]'
 
-# Not until the release (milestone 7).
-! stdout completion
+# Cobra's, for the packages to install (milestone 7).
+exec quantic --help
+stdout 'completion +Generate the autocompletion script for the specified shell'
+
+exec quantic completion bash
+stdout '^# bash completion V2 for quantic'
+exec quantic completion zsh
+stdout '^#compdef quantic'
+exec quantic completion fish
+stdout 'complete -c quantic'

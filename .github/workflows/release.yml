@@ -1,0 +1,42 @@
+name: Release
+
+# A tag like v0.1.0, pushed by the author, makes a release (ADR 0005). Main is
+# protected and every commit on it passed CI, so the tag only names one.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # the GitHub release and its files
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          # GoReleaser reads the tags and the history for the version and
+          # the changelog.
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: go test -race ./...
+
+      # Pinned to a commit, not a tag: this step holds the AUR key and the
+      # tap token, and a tag can be moved.
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.18.2
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUR_KEY: ${{ secrets.AUR_KEY }}
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
