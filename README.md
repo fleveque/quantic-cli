@@ -164,7 +164,9 @@ or write the cache).
 
 **Environment:** `QUANTIC_URL` points the CLI at another Quantic, such as `http://localhost:4000`
 for a local server (default `https://quantic.finance`); it has its own stored token.
-`QUANTIC_TOKEN` is a token to use instead of the stored one.
+`QUANTIC_TOKEN` is a token to use instead of the stored one. `QUANTIC_PORTFOLIO` is the portfolio
+when `--portfolio` isn't given: a program can name it there instead of in its arguments, which any
+local user can read with `ps`. The flag wins, even `--portfolio ""`.
 
 **Exit codes**, so scripts can react without parsing messages:
 

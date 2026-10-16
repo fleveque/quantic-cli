@@ -9,6 +9,7 @@ package cli
 import (
 	"fmt"
 	"io"
+	"os"
 	"runtime/debug"
 	"strings"
 	"time"
@@ -96,8 +97,9 @@ Tables are for people; --json is for scripts and status bars.
 Sign in with a personal API token from Quantic's settings: quantic auth login.
 
 Environment:
-  QUANTIC_URL    where Quantic is (default https://quantic.finance)
-  QUANTIC_TOKEN  a token to use instead of the stored one, for scripts and CI`,
+  QUANTIC_URL        where Quantic is (default https://quantic.finance)
+  QUANTIC_TOKEN      a token to use instead of the stored one, for scripts and CI
+  QUANTIC_PORTFOLIO  the portfolio when --portfolio isn't given`,
 
 		// Run prints errors itself, once, with the right exit code. Left on,
 		// Cobra would print each error a second time, and the whole usage
@@ -121,9 +123,15 @@ Environment:
 
 		// Runs before any command, this one included: the checks every
 		// command would otherwise repeat.
-		PersistentPreRunE: func(*cobra.Command, []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if opts.Timeout <= 0 {
 				return usageError("--timeout must be more than zero, got %s", opts.Timeout)
+			}
+			// A program can name the portfolio in the environment instead
+			// of the arguments, which any local user can read in ps. The
+			// flag still wins, even an empty one.
+			if !cmd.Flags().Changed("portfolio") {
+				opts.Portfolio = os.Getenv("QUANTIC_PORTFOLIO")
 			}
 			return nil
 		},
