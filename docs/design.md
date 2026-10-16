@@ -131,7 +131,8 @@ quantic version
 
 Global flags: `--json`, `--portfolio`, `--no-cache`, `--timeout` (default 10s). Environment:
 `QUANTIC_TOKEN` (overrides the keyring, for CI and scripts), `QUANTIC_URL` (defaults to
-`https://quantic.finance`; local Phoenix for development).
+`https://quantic.finance`; local Phoenix for development), `QUANTIC_PORTFOLIO` (the portfolio when
+`--portfolio` isn't given, so the widget keeps it out of `ps`).
 
 **Output:** tables for people, chosen when stdout is a terminal; `--json` for programs. Color only on
 a terminal, and never with `NO_COLOR` set.

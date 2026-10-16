@@ -31,7 +31,10 @@ Start with [README.md](README.md) and [docs/design.md](docs/design.md).
   reproducible archives, the AUR package `quantic-cli-bin`, a cask in `fleveque/homebrew-tap`, and
   Cobra's `completion`. The AUR takes no new accounts (since 2026-08), so its push is skipped until
   the `AUR_KEY` secret exists. The author adds the secrets and pushes the tags; never push a tag.
-  Lesson 07 and walkthrough 07. Next is milestone 8, `quantic dash`, when the author says.
+  Lesson 07 and walkthrough 07.
+- `QUANTIC_PORTFOLIO` (#15, for v0.1.1): the portfolio when `--portfolio` isn't given, so the widget
+  keeps it out of process arguments, which other local users can read (marketplace review,
+  omacom/omarchy-plugin-marketplace#11632). Next is milestone 8, `quantic dash`, when the author says.
 
 ## Conventions
 

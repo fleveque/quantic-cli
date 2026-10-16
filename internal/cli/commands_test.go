@@ -316,6 +316,31 @@ func TestUnknownPortfolio(t *testing.T) {
 	}
 }
 
+// QUANTIC_PORTFOLIO names the portfolio when --portfolio doesn't; the flag
+// wins, and an empty one means all of them.
+func TestPortfolioFromEnvironment(t *testing.T) {
+	t.Setenv("QUANTIC_TOKEN", testToken)
+	t.Setenv("QUANTIC_PORTFOLIO", "nope")
+	tests := []struct {
+		args  []string
+		query string
+	}{
+		{[]string{"holdings"}, "portfolio=nope"},
+		{[]string{"holdings", "--portfolio", "Pension"}, "portfolio=Pension"},
+		{[]string{"holdings", "--portfolio", ""}, ""},
+	}
+	for _, tt := range tests {
+		t.Run(strings.Join(tt.args, " "), func(t *testing.T) {
+			requests := fakeQuantic(t)
+			run(t, append(tt.args, "--no-cache")...)
+			u, _ := url.Parse(strings.TrimPrefix((*requests)[0], "GET "))
+			if u.Path != "/api/v1/holdings" || u.RawQuery != tt.query {
+				t.Errorf("requested %s, want the query %q", (*requests)[0], tt.query)
+			}
+		})
+	}
+}
+
 // The filters reach Quantic as its parameters, the symbol in capitals.
 func TestDividendsFilters(t *testing.T) {
 	requests := fakeQuantic(t)
